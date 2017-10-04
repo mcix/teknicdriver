@@ -1,0 +1,1 @@
+msbuild deltateknic.vcxproj /property:Configuration=Release  /property:Platform=X64
