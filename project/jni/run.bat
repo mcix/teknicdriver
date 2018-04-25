@@ -1,1 +1,1 @@
-java -Djava.library.path=./X64/Release DeltaProtoDriver 4
+java -Djava.library.path=./X64/Release nl.bytesoflife.DeltaProtoDriver 4

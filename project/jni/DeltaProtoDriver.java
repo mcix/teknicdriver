@@ -1,19 +1,50 @@
+package nl.bytesoflife;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.ActionListener;
+
+
 
 public class DeltaProtoDriver {
    static {
       System.loadLibrary("deltateknic"); 
    }
 
-   private native long openPort( int portNum );
-   private native void closePort( long pointer );
-   private native void moveTo( long pointer, int x, int y);
+   private static final int TRUE=1;
+   private static final int FALSE=0;
 
-   private native void setVar( long pointer, int x);
-   private native int getVar( long pointer );
+   private native long openPort( int portNum );
+   private native void home( long pointer );
+   private native void closePort( long pointer );
+   private native void moveTo( long pointer, int x, int y, int acc, int vel, int release);
+   private native void moveToX( long pointer, int x, int acc, int vel, int release);
+   private native void moveToY( long pointer, int y, int acc, int vel, int release);
+   private native void release( long pointer, int release);
+   private native double getPositionX( long pointer );
+   private native double getPositionY( long pointer );
+   private native int getMaxAcc( long pointer );
+   private native int getMaxVel( long pointer );
+   private native int getMinAcc( long pointer );
+   private native int getMinVel( long pointer );
+
+   protected int minAcc;
+   protected int minVel;
+   protected int maxAcc;
+   protected int maxVel;
+
+   public int getAccByPercentage( int perc ) {
+      Double x= ((double)(maxAcc - minAcc) / 100);
+      x= x * perc;
+      return x.intValue() + minAcc;
+   }
+
+   public int getVelByPercentage( int perc ) {
+      Double x= ((double)(maxVel - minVel) / 100);
+      x= x * perc;
+      return x.intValue() + minVel;
+   }
  
    // Test Driver
    public static void main(String[] args) {
@@ -27,6 +58,11 @@ public class DeltaProtoDriver {
 
       long p= dpd.openPort( port );
 
+      dpd.home(p);
+      dpd.maxAcc= dpd.getMaxAcc(p);
+      dpd.maxVel= dpd.getMaxVel(p);
+      dpd.minAcc= dpd.getMinAcc(p);
+      dpd.minVel= dpd.getMinVel(p);
 
       JFrame frame = new JFrame("Simple GUI"); 
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -34,16 +70,47 @@ public class DeltaProtoDriver {
       JPanel panel = new JPanel();
       frame.add(panel);
 
+      JTextField tfx= new JTextField("0", 10);
+      panel.add(tfx);
+      JTextField tfy= new JTextField("0", 10);
+      panel.add(tfy);
 
-      JButton buttonx = new JButton("move to 100 100");
+      JSlider slider= new JSlider(JSlider.VERTICAL, 0, 100, 0);
+      panel.add(slider);
+
+      JButton buttonx = new JButton("move to");
       panel.add(buttonx);
       buttonx.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent evt) {
-              System.out.println("move to 100 100");
-              dpd.moveTo(p, 1000, 1000);
+              
+              int x= Integer.valueOf(tfx.getText());
+              int y= Integer.valueOf(tfy.getText());
+
+              int acc= dpd.getAccByPercentage( (int)slider.getValue() );
+              int vel= dpd.getVelByPercentage( (int)slider.getValue() );
+
+              System.out.println("move to " + x + " " + y);
+
+              dpd.moveTo(p, x, y, acc, vel, FALSE);
           }
       });
 
+      JButton buttonget = new JButton("getPosition");
+      panel.add(buttonget);
+      buttonget.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent evt) {
+              System.out.println("getPositionX " + dpd.getPositionX( p ) );
+              System.out.println("getPositionY " + dpd.getPositionY( p ) );
+          }
+      });
+
+      JButton buttonrelease = new JButton("release");
+      panel.add(buttonrelease);
+      buttonrelease.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent evt) {
+              dpd.release(p, TRUE);
+          }
+      });
 
       JButton buttonclose = new JButton("close");
       panel.add(buttonclose);
@@ -54,22 +121,6 @@ public class DeltaProtoDriver {
               frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
           }
       });
-
-      JButton buttonget = new JButton("get");
-      panel.add(buttonget);
-      buttonget.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent evt) {
-              System.out.println("getVar " + dpd.getVar( p ) );
-          }
-      });
-
-      System.out.println("setVar 123" );
-      dpd.setVar( p, 123 );
-      System.out.println("getVar " + dpd.getVar( p ) );
-
-      System.out.println("setVar 456" );
-      dpd.setVar( p, 456 );
-      System.out.println("getVar " + dpd.getVar( p ) );
 
       frame.setLocationRelativeTo(null); 
       frame.pack(); 
