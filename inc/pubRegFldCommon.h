@@ -14,7 +14,7 @@
 //		2015-12-24 10:59:53
 // 
 // COPYRIGHT NOTICE:
-//		(C)Copyright 2010-2016  Teknic, Inc.  All rights reserved.
+//		(C)Copyright 2010-2018  Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification, 
 //		or portion thereof merged into another program. A copy of the 
@@ -370,7 +370,9 @@ typedef enum _commonAlertBits {
     ALERT_NET_WATCHDOG_BIT                      = 25,
     ALERT_NET_ESTOPPED_BIT                      = 28,   // mtn Shdn
     ALERT_NET_CONFIG_OUT_OF_DATE_BIT            = 29,   // sw Shdn
-    ALERT_RUN_TIME_ERR_BIT                      = 30    // sw Shdn
+    ALERT_RUN_TIME_ERR_BIT                      = 30,    // sw Shdn
+	ALERT_LOG_EPOCH_CODE                        = 0xFE,
+	ALERT_LOG_FREE_CODE                         = 0xFF
 } commonAlertBits;
 /** \endcond **/
 //                                                                           *
@@ -641,8 +643,49 @@ typedef enum _mnHLFBmodes {
 	HLFB_FORCE_OFF,					///<  3 Always off (test mode)
 	HLFB_FORCE_ON,					///<  4 Always on (test mode)
 	HLFB_INDEX,						///<  5 Output on when index occurs
-	HLFB_IN_RANGE					///<  6 Position in-range
+	HLFB_IN_RANGE,					///<  6 Position in-range
+	HLFB_TORQUE_ASG,				///<  7 Torque/ASG, 5%=-100, 95%=100
+	HLFB_TORQUE						///<  8 Torque out 5%=-100, 50%=0, 95%=100
 } mnHLFBmodes;
+//                                                                            *
+//*****************************************************************************
+
+
+
+//*****************************************************************************
+// NAME                                                                       *
+//  Disable Action enumerations
+//
+// DESCRIPTION
+/**
+ * Disable actions enumeration
+ *
+ * These values determine the drive's actions to take upon disable, LPB
+ * or AC Loss.
+ **/
+typedef enum _mnDisableActions {
+	/**
+	 * Use dynamic brake to stop
+	 *
+	 * This potentially is the most abrupt way to stop as it uses the
+	 * shorted motor windings to dissipate the kinetic energy of the
+	 * axis.
+	 **/
+	DYNAMIC_BRAKE,
+	/**
+	 * Controlled deceleration to a stop.
+	 *
+	 * Uses the motion constraints defined by the current move to
+	 * ramp to a stop then disable the drive.
+	 **/
+	DECEL_TO_STOP,
+	/**
+	 * Coast to a stop.
+	 *
+	 * Free wheel the axis until it stops from its own friction.
+	 **/
+	COAST
+} mnDisableActions;
 //                                                                            *
 //*****************************************************************************
 

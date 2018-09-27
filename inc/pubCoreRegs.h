@@ -1,8 +1,4 @@
 //***************************************************************************
-// $Archive: /ClearPath SC-1.0.123/User Driver/inc/pubCoreRegs.h $
-// $Revision: 246 $ $Date: 12/09/16 2:41p $
-// $Workfile: pubCoreRegs.h $
-//
 // DESCRIPTION:
 /**
 	\file
@@ -24,7 +20,7 @@
 //      06/19/2008 13:46:39
 //
 // COPYRIGHT NOTICE:
-//      (C)Copyright 2008-2016 Teknic, Inc.  All rights reserved.
+//      (C)Copyright 2008-2018 Teknic, Inc.  All rights reserved.
 //
 //      This copyright notice must be reproduced in any copy, modification,
 //      or portion thereof merged into another program. A copy of the
@@ -46,7 +42,7 @@
 #if defined(IMPL_NODE_CP)
 	#include "pubClearPathRegs.h"
 #endif
-#if !defined(__TI_COMPILER_VERSION__) || defined(_CPM_SC)
+#if !defined(__TI_COMPILER_VERSION__) || defined(_CPM_SC) || defined(_CLEARPATH)
 	#include "pubCpmRegs.h"
 #endif
 //                                                                           *
@@ -103,7 +99,7 @@ typedef union PACK_BYTES _optionReg {
 	/**
 		\brief Universal Option Field Definitions.
 	**/
-    struct _optionsCommon {
+    struct _optionsCommonFlds {
         /*                   -----------  ----------------------------------- *
          *                         bit #  description                         *
          *                   -----------  ----------------------------------- */
@@ -114,10 +110,11 @@ typedef union PACK_BYTES _optionReg {
 		/// Advanced feature supported
 		unsigned Advanced	:1; // 6 :	  Advanced features available
 														/// INTERNAL_DOC
-		int					:1; // 7  :
+		unsigned VectorLock	:1; // 7 :    Lock Vector Mode
 														///
 		/// Option board(s) installed
-        unsigned OptionBrd  :3; // 8-10:  Installed option board configuration
+        unsigned OptionBrd  :2; // 8-9:   Installed option board configuration
+        unsigned IgnoreIndx :1; // 10:	  Prevent Ref Offset on index
 														/// INTERNAL_DOC
         int					:1; // 11 :
 														///
@@ -128,11 +125,55 @@ typedef union PACK_BYTES _optionReg {
 														///
 		/// Special debugging flags
         unsigned Debug      :3; // 25-27: Debug flags
-    };                   
+    };
+    struct _drvCommonFlds {
+        /*                   -----------  ----------------------------------- *
+         *                         bit #  description                         *
+         *                   -----------  ----------------------------------- */
+        unsigned VoltMode		: 1; // 0:  Volt mode setup
+        unsigned RuntimeCal		: 1; // 1:  1=Enable run time calibration
+        unsigned ClockCal		: 1; // 2:  1=clock calibration
+        unsigned DirCwPositive	: 1; // 3:  1=CW direction is positive motion
+
+        unsigned Product		: 3; // 4:  3-bit product number
+									 // 5:  ""
+									 // 6:	""
+        /**
+    		\brief Vector Lock Diagnostic Enable
+
+            If the motor is vector oriented, such as a brushless motor
+            this will force the vector to freeze.
+        **/
+        unsigned VectorLock : 1; // 7   Lock Vector Mode
+
+        /**
+    		\brief Missing index tolerance
+
+    		When index checking is set, this field is the number of
+    		index pulses that can be missing before an error is flagged.
+    		0 = any missed index is an error
+        **/
+        unsigned IndexTolerance	: 2;    // 8-9
+        /**
+    		\brief Inhibit motor index processing for vector refinement.
+
+            If set, the encoder's index is ignored for vector processing. This
+    		is useful for development purposes as well as factory motor setup
+    		when combined with #CpHwConfigReg::SensorlessMode mode.
+        **/
+    	unsigned IgnoreIndx	 : 1;//  10 Prevent Ref Offset on index
+    	unsigned NoVectUpdate: 1;//  11 do not apply the angle from the enhanced sensorless algorithm
+		/// Hardware platform code
+    	unsigned HwPlatform :4; // 12-15: Hardware platform (enum _hwPlatforms)
+   };
 	/**
 		Access to common fields among nodes.
 	**/
-	struct _optionsCommon Common;
+	struct _optionsCommonFlds Common;
+	/**
+		Access to common fields among drives.
+	**/
+	struct _drvCommonFlds DrvCommon;
     // - - - - - - - - - - - - - - - - - - - -
     // DRIVE PRODUCT OPTION DEFINITIONS
     // - - - - - - - - - - - - - - - - - - - -
@@ -306,6 +347,8 @@ typedef union MN_EXPORT PACK_BYTES _alertReg {
         #ifdef __TI_COMPILER_VERSION__
             bool InShutdown();
             bool InLockdown();
+            bool InPwrEvent();
+            bool InPwrEventShutdown();
             bool InBlockMotionShutdown();
             bool InBlockMotionSelfClearShutdown();
             bool InNodeNeedsRepairShutdown();
@@ -354,6 +397,7 @@ typedef enum _drvAlertBits {
 	DRV_ALERT_AC_POWER_LOST_BIT					= 52,
 	DRV_ALERT_IEX_LINK_GLITCH_BIT               = 53,
 	DRV_ALERT_IEX_LINK_MULTI_GLITCH_BIT         = 54,
+	DRV_ALERT_MTR_UNDERTEMP_BIT			        = 55,
 	DRV_ALERT_MTR_COMM_BAD_SEQ_BIT              = 56,   // mtn Shdn
 	DRV_ALERT_MTR_COMM_BAD_STATE_BIT            = 57,   // mtn Shdn
 	DRV_ALERT_MTR_VECTOR_ERR_BIT                = 58,   // mtn Shdn
@@ -378,13 +422,13 @@ typedef enum _drvAlertBits {
 	DRV_ALERT_NOCOMM_DIRECTION_ERROR_BIT        = 77,   // mtn Shdn
 	DRV_ALERT_NOCOMM_FAIL_BIT					= 78,	
 	DRV_ALERT_MTR_ENC_INDEX_MISSING_WARN_BIT	= 79,
-	DRV_ALERT_TEMP_AMBIENT_BIT                  = 80,   // mtn Shdn
-	DRV_ALERT_TEMP_HEATSINK_BIT                 = 81,   // mtn Shdn
+	DRV_ALERT_TEMP_AMBIENT_BIT                  = 80,   // mtn Shdn (drive hot)
+	DRV_ALERT_TEMP_HEATSINK_BIT                 = 81,   // mtn Shdn (stator hot)
 	DRV_ALERT_BUS_OVERCURRENT_BIT               = 82,   // mtn Shdn
 	DRV_ALERT_BUS_OVERVOLTAGE_BIT               = 83,   // mtn Shdn
 	DRV_ALERT_BUS_VOLTAGE_LOW_BIT               = 84,   // mtn Shdn
 	DRV_ALERT_BUS_RMS_OVERLOAD_BIT              = 85,   // mtn Shdn
-	DRV_ALERT_FAN_SPEED_LOW_BIT                 = 86,
+	DRV_ALERT_FAN_SPEED_LOW_BIT                 = 86,   // mtn Shdn
 	DRV_ALERT_MTR_ENC_INDEX_MISSING_BIT         = 87,
 	DRV_ALERT_NOCOMM_HW_FAULT_BIT				= 88,
 	DRV_ALERT_NOCOMM_BUS_LOW_BIT				= 89,
@@ -392,10 +436,60 @@ typedef enum _drvAlertBits {
 	DRV_ALERT_FW_MOVEGEN_LIMSW_LOCKDN_BIT       = 91,
 	DRV_ALERT_FW_MOVEGEN_SOFTLIM_LOCKDN_BIT     = 92,
 	DRV_ALERT_MTR_ENC_INDEX_MISPLACED_BIT		= 93,
-	DRV_ALERT_BUS_SINGLE_PHASE_LOW_BIT			= 94,
-	ALERT_LOG_EPOCH_CODE                        = 0xFE,
-	ALERT_LOG_FREE_CODE                         = 0xFF
 } drvAlertBits;
+
+// These bit numbers must match the locations in the alertReg union
+// They are used by coding that requires either a mask or a bit number.
+/*
+    Bit Number index for the Alert Register
+
+    These number can be used to construct masks.
+*/
+typedef enum _cpmAlertBits {
+    CPM_ALERT_FW_BAD_RAS_REQUEST_BIT            = DRV_ALERT_FW_BAD_RAS_REQUEST_BIT,     // 36
+    CPM_ALERT_FW_MOVE_BUF_UNDERRUN_BIT          = DRV_ALERT_FW_MOVE_BUF_UNDERRUN_BIT,   // 37
+    CPM_ALERT_FW_BAD_RAS_VELOCITY_BIT           = DRV_ALERT_FW_BAD_RAS_VELOCITY_BIT,    // 38
+    CPM_ALERT_FW_MOVE_SPEC_ALTERED_BIT          = DRV_ALERT_FW_MOVE_SPEC_ALTERED_BIT,   // 39
+    CPM_ALERT_HW_PHASE_SENSOR_BIT               = DRV_ALERT_HW_PHASE_SENSOR_BIT,        // 40 HW Shdn
+    CPM_ALERT_FW_MOVEGEN_LIMSW_BIT              = DRV_ALERT_FW_MOVEGEN_LIMSW_BIT,       // 41
+    CPM_ALERT_FW_MOVEGEN_SOFTLIM_BIT            = DRV_ALERT_FW_MOVEGEN_SOFTLIM_BIT,     // 42
+    CPM_ALERT_FW_MOVE_BUF_OVERRUN_LOCKDN_BIT    = DRV_ALERT_FW_MOVE_BUF_OVERRUN_LOCKDN_BIT,// 43
+    CPM_ALERT_IO_INVALID_BIT                    = DRV_ALERT_IO_INVALID_BIT,             // 50
+    CPM_ALERT_IO_INVALID_LOCKDN_BIT             = DRV_ALERT_IO_INVALID_LOCKDN_BIT,      // 51
+    CPM_ALERT_AC_POWER_LOST_BIT                 = DRV_ALERT_AC_POWER_LOST_BIT,          // 52
+    CPM_ALERT_AC_PHASE_WIRING_ERROR_BIT         = 53,                                   // 53
+    CPM_ALERT_MTR_UNDERTEMP_BIT                 = DRV_ALERT_MTR_UNDERTEMP_BIT,          // 55
+    CPM_ALERT_MTR_VECTOR_ERR_BIT                = DRV_ALERT_MTR_VECTOR_ERR_BIT,         // 58 mtn Shdn
+    CPM_ALERT_MTR_ENC_GLITCH_BIT                = DRV_ALERT_MTR_ENC_GLITCH_BIT,         // 60 mtn Shdn
+    CPM_ALERT_MTR_ENC_OVERSPEED_BIT             = DRV_ALERT_MTR_ENC_OVERSPEED_BIT,      // 61 mtn Shdn
+    CPM_ALERT_MTR_PHASE_OVERLOAD_BIT            = DRV_ALERT_MTR_PHASE_OVERLOAD_BIT,     // 64 mtn Shdn
+    CPM_ALERT_MTR_BAD_SETUP_PARAMS_BIT          = DRV_ALERT_MTR_BAD_SETUP_PARAMS_BIT,   // 66 sw Shdn
+    CPM_ALERT_SVO_HARDSTOP_RELEASE_BIT          = DRV_ALERT_SVO_HARDSTOP_RELEASE_BIT,   // 67 mtn Shdn
+    CPM_ALERT_SVO_TRACKING_CRIT_BIT             = DRV_ALERT_SVO_TRACKING_CRIT_BIT,      // 69 mtn Shdn
+    CPM_ALERT_SVO_RMS_OVERLOAD_BIT              = DRV_ALERT_SVO_RMS_OVERLOAD_BIT,       // 70 mtn Shdn
+    CPM_ALERT_SVO_RMS_CRIT_OVERLOAD_BIT         = DRV_ALERT_SVO_RMS_CRIT_OVERLOAD_BIT,  // 71 mtn Shdn
+    CPM_ALERT_SVO_STEP_NOISE_BIT                = DRV_ALERT_SVO_STEP_NOISE_BIT,         // 73 mtn Shdn
+    CPM_ALERT_SVO_VOLT_SAT_BIT                  = DRV_ALERT_SVO_VOLT_SAT_BIT,           // 74 mtn Shdn
+    CPM_ALERT_SVO_TRQ_SAT_BIT                   = DRV_ALERT_SVO_TRQ_SAT_BIT,            // 75 mtn Shdn
+    CPM_ALERT_NOCOMM_DIST_ERROR_BIT             = DRV_ALERT_NOCOMM_DIST_ERROR_BIT,      // 76 mtn Shdn
+    CPM_ALERT_NOCOMM_DIRECTION_ERROR_BIT        = DRV_ALERT_NOCOMM_DIRECTION_ERROR_BIT, // 77 mtn Shdn
+    CPM_ALERT_NOCOMM_FAIL_BIT                   = DRV_ALERT_NOCOMM_FAIL_BIT,            // 78
+    CPM_ALERT_MTR_ENC_INDEX_MISSING_WARN_BIT    = DRV_ALERT_MTR_ENC_INDEX_MISSING_WARN_BIT, // 79
+    CPM_ALERT_TEMP_DRIVE_BIT                    = DRV_ALERT_TEMP_AMBIENT_BIT,           // 80 mtn Shdn
+    CPM_ALERT_TEMP_STATOR_BIT                   = DRV_ALERT_TEMP_HEATSINK_BIT,          // 81 mtn Shdn
+    CPM_ALERT_BUS_OVERCURRENT_BIT               = DRV_ALERT_BUS_OVERCURRENT_BIT,        // 82 mtn Shdn
+    CPM_ALERT_BUS_OVERVOLTAGE_BIT               = DRV_ALERT_BUS_OVERVOLTAGE_BIT,        // 83 mtn Shdn
+    CPM_ALERT_BUS_VOLTAGE_LOW_BIT               = DRV_ALERT_BUS_VOLTAGE_LOW_BIT,        // 84 mtn Shdn
+    CPM_ALERT_BUS_RMS_OVERLOAD_BIT              = DRV_ALERT_BUS_RMS_OVERLOAD_BIT,       // 85 mtn Shdn
+    CPM_ALERT_BUS_PWR_MISMATCH_BIT              = 86,                                   // 86 Power issue (v1.6)
+    CPM_ALERT_MTR_ENC_INDEX_MISSING_BIT         = DRV_ALERT_MTR_ENC_INDEX_MISSING_BIT,  // 87
+    CPM_ALERT_BUS_VOLTAGE_UNDER_OPERATING_V_BIT = 88,                                   // 88 Power issue (v1.6)
+    CPM_ALERT_FW_MOVEGEN_LIMSW_LOCKDN_BIT       = DRV_ALERT_FW_MOVEGEN_LIMSW_LOCKDN_BIT,// 91
+    CPM_ALERT_FW_MOVEGEN_SOFTLIM_LOCKDN_BIT     = DRV_ALERT_FW_MOVEGEN_SOFTLIM_LOCKDN_BIT, // 92
+    CPM_ALERT_MTR_ENC_INDEX_MISPLACED_BIT       = DRV_ALERT_MTR_ENC_INDEX_MISPLACED_BIT,// 93
+    CPM_ALERT_STEPS_DURING_POSN_RECOVERY_BIT    = 94,                                   // 94
+} cpmAlertBits;
+
 //                                                                            *
 //*****************************************************************************
 													/** \endcond **/
@@ -428,7 +522,23 @@ typedef enum _drvAlertBits {
 **/
 typedef struct _alertLogEntry {
     Uint32 Timestamp;               ///< Time stamp code
-    drvAlertBits Reason;            ///< Reason and/or description
+	union _alertReasons {
+    	commonAlertBits common;
+		drvAlertBits isc;
+		cpmAlertBits cpm;
+		Uint32 bits;
+		// Common translators
+		void operator=(const commonAlertBits updVal) { common = updVal; }
+		void operator=(const drvAlertBits updVal) { isc = updVal; }
+		void operator=(const cpmAlertBits updVal) { cpm = updVal; }
+		bool operator==(const commonAlertBits lVal) { return common == lVal; }
+		bool operator!=(const commonAlertBits lVal) { return common != lVal; }
+		// Common constructors
+		_alertReasons(const commonAlertBits initVal) { common=initVal; }
+		_alertReasons(const drvAlertBits initVal) { isc=initVal; }
+		_alertReasons(const cpmAlertBits initVal) { cpm=initVal; }
+		_alertReasons() { bits = 0; }
+	} Reason;            ///< Reason and/or description
 } alertLogEntry;
 // - - - - - - - - - - - - - - - - -
 // Alert command arguments
@@ -665,22 +775,22 @@ typedef union _plaFuses {
     /// The bits in this structure select the AND outputs to be
     /// ORed together to make an output bit.
     struct  _orFuses {
-        int and00        : 1;                ///< Select AND term 00
-        int and01        : 1;                ///< Select AND term 01
-        int and02        : 1;                ///< Select AND term 02
-        int and03        : 1;                ///< Select AND term 03
-        int and04        : 1;                ///< Select AND term 04
-        int and05        : 1;                ///< Select AND term 05
-        int and06        : 1;                ///< Select AND term 06
-        int and07        : 1;                ///< Select AND term 07
-        int and08        : 1;                ///< Select AND term 08
-        int and09        : 1;                ///< Select AND term 09
-        int and10        : 1;                ///< Select AND term 10
-        int and11        : 1;                ///< Select AND term 11
-        int and12        : 1;                ///< Select AND term 12
-        int and13        : 1;                ///< Select AND term 13
-        int and14        : 1;                ///< Select AND term 14
-        int and15        : 1;                ///< Select AND term 15
+        unsigned and00        : 1;                ///< Select AND term 00
+        unsigned and01        : 1;                ///< Select AND term 01
+        unsigned and02        : 1;                ///< Select AND term 02
+        unsigned and03        : 1;                ///< Select AND term 03
+        unsigned and04        : 1;                ///< Select AND term 04
+        unsigned and05        : 1;                ///< Select AND term 05
+        unsigned and06        : 1;                ///< Select AND term 06
+        unsigned and07        : 1;                ///< Select AND term 07
+        unsigned and08        : 1;                ///< Select AND term 08
+        unsigned and09        : 1;                ///< Select AND term 09
+        unsigned and10        : 1;                ///< Select AND term 10
+        unsigned and11        : 1;                ///< Select AND term 11
+        unsigned and12        : 1;                ///< Select AND term 12
+        unsigned and13        : 1;                ///< Select AND term 13
+        unsigned and14        : 1;                ///< Select AND term 14
+        unsigned and15        : 1;                ///< Select AND term 15
     } orFuse;                               ///< OR term selector type.
     /// The bits in this structure select the output bits.
     plaOutReg outFuse;
@@ -1075,12 +1185,10 @@ typedef union MN_EXPORT PACK_BYTES _mnStatusReg {
 	**/
 	iscStatusRegOldFlds Fld;
 													/** \endcond **/
-#if !defined(__TI_COMPILER_VERSION__) || defined(_CPM_SC)
 	/**
 		\brief Access to the ClearPath-SC status fields
 	**/
 	cpmStatusRegFlds cpm;
-#endif
 													/** \cond INTERNAL_DOC **/
     #ifdef __cplusplus
 	/// Indices into bitwise register access by functional purpose

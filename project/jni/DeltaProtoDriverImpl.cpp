@@ -74,6 +74,10 @@ private:
         }
 #endif 
 
+int main(int argc, char* argv[])
+{
+}
+
 DeltaProtoDriverObj::DeltaProtoDriverObj() 
 {
 }
@@ -187,9 +191,12 @@ void DeltaProtoDriverObj::homeAllNodes(IPort *myPort) {
 }
 
 void DeltaProtoDriverObj::openPort( int portNum ) {
+	size_t portCount = 0;
+	std::vector<std::string> comHubPorts;
+
 	//Create the SysManager object. This object will coordinate actions among various ports
 	// and within nodes. In this example we use this object to setup and open our port.
-	SysManager myMgr;							//Create System Manager myMgr
+	SysManager* myMgr = SysManager::Instance();									//Create System Manager myMgr
 
 	printf("openPort%i\n", portNum);
 
@@ -200,10 +207,54 @@ void DeltaProtoDriverObj::openPort( int portNum ) {
 	//otherwise the catch loop is skipped over
 	try
 	{ 
-		myMgr.ComHubPort(0, portNum); 	//define the first SC Hub port (port 0) to be associated 
-										// with COM portNum (as seen in device manager)
-										
-		myMgr.PortsOpen(1);				//Open the port
+		SysManager::FindComHubPorts(comHubPorts);
+		printf("Found %d SC Hubs\n", comHubPorts.size());
+
+		for (portCount = 0; portCount < comHubPorts.size() && portCount < NET_CONTROLLER_MAX; portCount++) {
+			
+			myMgr->ComHubPort(portCount, comHubPorts[portCount].c_str()); 	//define the first SC Hub port (port 0) to be associated 
+											// with COM portnum (as seen in device manager)
+		}
+
+		if (portCount > 0) {
+			//printf("\n I will now open port \t%i \n \n", portnum);
+			myMgr->PortsOpen(portCount);				//Open the port
+
+			//IPort &myPort = myMgr->Ports(i);
+			m_iPort = &(myMgr->Ports(0));
+
+			for (size_t iNode = 0; iNode < m_iPort->NodeCount(); iNode++) {
+				try {
+					// Create a shortcut reference for the first node
+					INode &theNode = m_iPort->Nodes(iNode);
+					printf("   Node[0]: type=%d\n", theNode.Info.NodeType());
+					printf("            userID: %s\n", theNode.Info.UserID.Value());
+					printf("        FW version: %s\n", theNode.Info.FirmwareVersion.Value());
+					printf("          Serial #: %d\n", theNode.Info.SerialNumber.Value());
+					printf("             Model: %s\n", theNode.Info.Model.Value());
+
+					if( iNode == 0 ) {
+						m_node_x= &theNode;
+					}
+					else {
+						m_node_y= &theNode;
+					}
+				}
+				catch (mnErr theErr)
+				{
+					//This statement will print the address of the error, the error code (defined by the mnErr class), 
+					//as well as the corresponding error message.
+					printf("Caught error: addr=%d, err=0x%08x\nmsg=%s\n", theErr.TheAddr, theErr.ErrorCode, theErr.ErrorMsg);
+				}
+			}
+		}
+		else {
+			printf("Unable to locate SC hub port\n");
+
+			//msgUser("Press any key to continue."); //pause so the user can see the error message; waits for user to press a key
+
+			//return -1;  //This terminates the main program
+		}
 	}			
 	catch(mnErr theErr)	//This catch statement will intercept any error from the Class library
 	{
@@ -213,33 +264,7 @@ void DeltaProtoDriverObj::openPort( int portNum ) {
 		printf("Caught error: addr=%d, err=0x%08x\nmsg=%s\n", theErr.TheAddr, theErr.ErrorCode, theErr.ErrorMsg);
 	}
 
-	m_sysManager= &myMgr;
-
-	m_iPort = &(myMgr.Ports(0));
-	for (size_t iNode = 0; iNode < m_iPort->NodeCount(); iNode++) {
-		try {
-			// Create a shortcut reference for the first node
-			INode &theNode = m_iPort->Nodes(iNode);
-			printf("   Node[0]: type=%d\n", theNode.Info.NodeType());
-			printf("            userID: %s\n", theNode.Info.UserID.Value());
-			printf("        FW version: %s\n", theNode.Info.FirmwareVersion.Value());
-			printf("          Serial #: %d\n", theNode.Info.SerialNumber.Value());
-			printf("             Model: %s\n", theNode.Info.Model.Value());
-
-			if( iNode == 0 ) {
-				m_node_x= &theNode;
-			}
-			else {
-				m_node_y= &theNode;
-			}
-		}
-		catch (mnErr theErr)
-		{
-			//This statement will print the address of the error, the error code (defined by the mnErr class), 
-			//as well as the corresponding error message.
-			printf("Caught error: addr=%d, err=0x%08x\nmsg=%s\n", theErr.TheAddr, theErr.ErrorCode, theErr.ErrorMsg);
-		}
-	}
+	m_sysManager= myMgr;
 
 	printf("OpenState %i \n", m_iPort->OpenState());
 

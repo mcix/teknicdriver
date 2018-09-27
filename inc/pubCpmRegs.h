@@ -1,8 +1,4 @@
 //*****************************************************************************
-// $Archive: /ClearPath SC/User Driver/inc/pubCpmRegs.h $
-// $Revision: 69 $ $Date: 12/12/16 2:48p $
-// $Workfile: pubCpmRegs.h $
-//
 // DESCRIPTION:
 /**
 	\file
@@ -23,7 +19,7 @@
 //		2015-12-23 16:26:15
 // 
 // COPYRIGHT NOTICE:
-//		(C)Copyright 2015-2016  Teknic, Inc.  All rights reserved.
+//		(C)Copyright 2015-2018  Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification, 
 //		or portion thereof merged into another program. A copy of the 
@@ -148,6 +144,8 @@ typedef enum _cpmParams {
     CPM_P_VEL_MEAS,                      // 85 55 Measured velocity
     CPM_P_VEL_CMD,                       // 86 56 Commanded velocity
 
+    CPM_P_DRV_RMS_SLOW_LVL=88,           // 88 58 RMS level (slow acting)
+
     CPM_P_POSN_TRK=90,                   // 90 5a Position tracking error
     CPM_P_POSN_TRK_RANGE,                // 91 5b Tracking in-range window
     CPM_P_DRV_MV_DN_TC,                  // 92 5c Move Done: Time Constant (ms)
@@ -178,12 +176,14 @@ typedef enum _cpmParams {
     CPM_P_POSN_TRK_ERR_LIM,              // 272 10 Position tracking rrror limit
 	CPM_P_DRV_RMS_INIT,					 // 273 11 RMS initial value on reset (%)
 	CPM_P_DRV_IB_PEAK,					 // 274 12 IB Level Peak
+    CPM_P_DRV_RMS_SLOW_LIM,				 // 275 13 RMS shutdown limit (A) (Slow acting)
+	CPM_P_TP_PHASE_BD = 276,			 // 276 14 Phase board test point
 
 	CPM_P_POSN_CAP_INB=277,				 // 277 15 Captured position (Input B)
 // Drive State Items   
     CPM_P_DRV_BUS_VOLTS=280,             // 280 18 Real-time Bus Voltage (V)
     CPM_P_DRV_CONFIG_CHANGED,            // 281 19 Configuration changed
-    CPM_P_AMBIENT_TEMP=291,              // 291 23 Internal temperature
+    CPM_P_DRIVE_TEMP=291,              	 // 291 23 Drive temperature (deg C)
     CPM_P_DRV_IB_LVL=294,                // 294 26 IB Level
 
 	CPM_P_OVER_TEMP_TRIP=308,			 // 308 34 Over-Temp Trip Point
@@ -234,18 +234,23 @@ typedef enum _cpmParams {
     CPM_P_DRV_HARDSTOP_ENTRY_TC,         // 361 69 Hard Stop: entry delay (ms)
 
 	CPM_P_DRV_HARDSTOP_TRQ_LIM=363,		 // 363 6b Alt Trq Lim for Hardstop homing (A)
-
+    CPM_P_DRV_RMS_SLOW_TC,               // 364 6c RMS time constant (sec) @ 100% trq (slow acting)
+		
 	CPM_P_DLY_TO_DISABLE=368,			 // 368 70 Delay to Disable for brakes (ms)
-// Regen settings
-	CPM_P_DRV_REGEN_LIM,				 // 369 71 Regen current limit (A)
+	CPM_P_FACT_SOFT_START_FREQ,			 // 369 71 Soft start PWM carrier frequency (Hz)
+// VRS settings
+	CPM_P_DRV_VRS_TRQ_FILT=370,			 // 370 72 VRS Filtering (ms)
+	CPM_P_DRV_VRS_FULL_ON=371,			 // 371 73 VRS High Limit (V)
+	CPM_P_DRV_VRS_FULL_OFF=362,			 // 362 6a VRS Low Limit (V)
+	CPM_P_DRV_BUSV_ADJ_RATE=372,		 // 372 74 VBus runtime adjust rate (ms)
 
 // Drive Set Flags Register
 	CPM_P_DRV_SET_FLAGS=375,			 // 375 77 Drive SetFlags Register
-	CPM_P_DRV_UNDER_TEMP_TRIP=379,		 //	379 7b Under-Temp Trip (deg C 10.6)
+	CPM_P_FACT_UNDER_TEMP_TRIP=379,		 //	379 7b Under-Temp Trip (deg C 10.6)
 	CPM_P_DRV_ENCODER_TEMP,     		 // 380 7c Internal temp of encoder (deg C 10.6)
 	CPM_P_DRV_STATOR_TEMP,				 // 381 7d Internal temp of stator (deg C 10.6)
-	CPM_P_DRV_OVER_TEMP_TRIP_STATOR,	 // 382 7e Over-Temp Trip Stator (deg. C)
-	CPM_P_DRV_OVER_TEMP_WARN_STATOR,	 // 383 7f Over-Temp Warn Stator (deg. C)
+	CPM_P_FACT_OVER_TEMP_TRIP_STATOR,	 // 382 7e Over-Temp Trip Stator (deg. C)
+	CPM_P_FACT_OVER_TEMP_WARN_STATOR,	 // 383 7f Over-Temp Warn Stator (deg. C)
 
 // Bank 2 Items - Application Specific Settings
 	// Homing Settings
@@ -253,8 +258,14 @@ typedef enum _cpmParams {
     CPM_P_APP_HOMING_OFFSET,             // 513 01 Initial offset index after homing
     CPM_P_APP_HOMING_ACCEL,				 // 514 02 Homing acceleration
     CPM_P_APP_HOMING_DELAY=516,          // 516 04 Homing delay after hardstop
+	CPM_P_EVENT_SHUTDOWN_MASK,           // 517 05 Power event shutdown/warning selector (0=warning, 1=shutdown)
 
+	CPM_P_PWR_AC_LOSS_TC,				 // 518 06 AC Loss shutdown/warning time constant
+	CPM_P_PWR_AC_WIRING_ERROR_TC,		 // 519 07 AC Wiring Error shutdown/warning time constant
+
+	CPM_P_FACT_LPB_RESTORE_V = 520,		 // 520 08 Bus V restoration voltage
 	CPM_P_PWRUP_HOLDOFF_TIME = 521,		 // 521 09 Sensorless startup holdoff after powerup
+	CPM_P_FACT_LPB_ENTRY_V = 522,		 // 522 0a Bus V minimum operation voltage
 
 	CPM_P_XPS_OUT_SRC_REG = 545,		 // 545 21 XPS output register MUX
 	CPM_P_XPS_IN_SRC_REG,				 // 546 22 XPS input register MUX
@@ -277,7 +288,12 @@ typedef enum _cpmParams {
 
 	CPM_P_USER_SOFT_LIM_POSN_1 = 568,	 // 568 38 User defined software limit 1
 	CPM_P_USER_SOFT_LIM_POSN_2,			 // 569 39 User defined software limit 2
-	CPM_P_POWER_REG = 572				 // 572 3c Power Status Register
+	CPM_P_POWER_REG = 572,				 // 572 3c Power Status Register
+	CPM_P_FACT_PHASE_BD_SN = 574,		 // 574 3e Phase board serial num
+	CPM_P_FACT_PHASE_BD_REV,			 // 575 3f Phase board rev
+	CPM_P_DRV_MIN_OPER_VOLTS = 578,		 // 578 42 Minimum operating voltage
+	CPM_P_OVER_TEMP_TRIP_USER,			 // 579 43 User Over-Temp Trip
+	CPM_P_DRV_IB_TRIP_USER,				 // 580 44 User IB Trip
 } cpmParams;
 													/** \endcond **/
 
@@ -341,9 +357,23 @@ struct _cpmHwConfigFlds {
 		commanded.
 	**/
 	BFld AtPositionMeas : 1;					// 6
+	/**
+		\brief Vector Regen Shunt Enable.
+
+		If set, allow excess bus voltage to be dissipated in the windings.
+	**/
+	BFld VRSEnable : 1;							// 7
+	/**
+		\brief Vector Validation.
+
+		If set, compare the sensorless start vector with the RO value.
+		If outside the acceptable range, cause a shutdown.
+	**/
+	BFld VectorValidation : 1;					// 8
 													/**  INTERNAL_DOC **/
-	BFld: 3;									// 7-9
+	BFld 	: 1;    							// 9
 													/**  **/
+													/** \endcond  **/
 	/**
 		\brief High-Speed Position Capture control
 
@@ -381,7 +411,7 @@ struct _cpmHwConfigFlds {
 		a power supply. This minimizes a power supply overload condition
 		when a system is first powered up.
 
-		\note The power-on-delay parameter maybe used to stagger the vector 
+		\note The power-on-delay parameter may be used to stagger the vector 
 		initialize for power-on mode.
 	**/
 	BFld SensorlessOnEnable : 1;				// 13
@@ -392,9 +422,45 @@ struct _cpmHwConfigFlds {
 		to a switch input, 1 is homing to a hardstop
 	**/
 	BFld HomingStyle : 1;						// 14
+
+	/*!
+		\brief <i>Step & Direction Command Input Format</i>
+
+		If asserted, the input format will use the quadrature format. If
+		not asserted, the input format is step & direction.
+
+		\note This feature was introduced with firmware version 1.6
+
+		\note Used by ClearView
+	**/
+	BFld StepDirAsQuadrature: 1;				// 15
+
+    /**
+     * \brief Expected Power Source
+     *
+     *  On AC capable motors, this field sets the expected power connection.
+     *
+     *  Set to 0 for all DC powered motors and 1 for AC Powered.
+     *
+	 *	\note This feature was introduced with firmware version 1.6
+	 *
+	 *	\note Used by ClearView
+     **/
+    unsigned UsingAC : 1;						// 16 0=DC, 1=AC
+    /**
+     * \brief Expected AC Power Type
+     *
+     *  On AC capable motors, this field sets the expected AC power source.
+     *
+     *  Set to 0 for all 3phase powered motors and 1 for single phase.
+     *
+	 *	\note This feature was introduced with firmware version 1.6.10
+	 *
+	 *	\note Used by ClearView
+     **/
+    unsigned Using1PhAC : 1;					// 17 0=3ph, 1=1ph
 													/**  INTERNAL_DOC **/
-	BFld: 1;									// 15
-	BFld: 4;									// 16-19
+	BFld: 2;									// 18-19
 													/**  **/
 	/**
 		\brief Sensorless start algorithm(s) to use
@@ -403,6 +469,10 @@ struct _cpmHwConfigFlds {
 		start method.
 	**/
 	BFld ValidStartMethods		 : 4;			// 20-23
+
+	BFld: 6;									// 24-29
+
+	unsigned UsingBlower : 1;					// 30
 };
 /// ClearPath-SC Hardware Configuration Field Definitions.
 typedef struct _cpmHwConfigFlds cpmHwConfigFlds;
@@ -433,6 +503,17 @@ union PACK_BYTES _cpmHwConfigReg {
     Uint32 bits;
 	/// \brief Field access for hardware configuration.
 	cpmHwConfigFlds Fld;
+
+#ifdef __cplusplus
+#ifndef __TI_COMPILER_VERSION__
+
+	/// Clear bits on construction
+	_cpmHwConfigReg() {
+		bits = 0;
+	}
+
+#endif
+#endif
 };
 /// \copybrief _cpmHwConfigReg
 typedef union _cpmHwConfigReg  cpmHwConfigReg;
@@ -548,9 +629,10 @@ struct PACK_BYTES _cpmAppConfigFlds {
 		\note Used by ClearView
 	**/
 	BFld DirInputReverse : 1;				// 14
-													/**  INTERNAL_DOC **/
+
+	/**  INTERNAL_DOC **/
 	BFld: 1;								// 15
-													/**  **/
+
 	/*!
 		\brief <i>Offset Move Performed in Homing Direction</i>
 
@@ -564,7 +646,7 @@ struct PACK_BYTES _cpmAppConfigFlds {
 	BFld: 1;								// 17 
 	BFld: 1;								// 18 
 												/**  **/
-/*!
+	/*!
 		\brief <i>Homing Direction</i>
 
 		Sets the direction for rotation for the homing sequence (asserted
@@ -573,8 +655,20 @@ struct PACK_BYTES _cpmAppConfigFlds {
 		\note Used by ClearView
 	**/
 	BFld HomingDirection : 1;				// 19
+
+	/**  **/
+	/*!
+		\brief <i>On Disable Action</i>
+
+		Sets the action the motor will take upon disabling and for AC
+		units upon loss of AC power.
+
+		\note Used by ClearView and introduced with firmware version 1.6.
+	**/
+	mnDisableActions DisableAction : 3;		// 20-22
+
 													/**  INTERNAL_DOC **/
-	BFld: 10;								// 20-29
+	BFld: 7;								// 23-29
 													/**  **/
 	/*!
 		\brief <i>Manual Homing</i>
@@ -645,9 +739,6 @@ typedef union _cpmAppConfigReg cpmAppConfigReg;
 //*****************************************************************************
 //  NAME                                                                      *
 //      cpmOutFlds structure
-//
-//  AUTHOR:
-//      Dave Sewhuk - created on 02/17/2010 16:08:32
 //
 //  DESCRIPTION:
 /**
@@ -822,6 +913,17 @@ union PACK_BYTES _cpmOutReg
 		\brief Field access to the ClearPath-SC output register.
 	**/
 	cpmOutFlds Fld;
+
+#ifdef __cplusplus
+#ifndef __TI_COMPILER_VERSION__
+
+	/// Clear bits on construction
+	_cpmOutReg() {
+		bits = 0;
+	}
+
+#endif
+#endif
 };
 
 /// ClearPath-SC Output Register Type
@@ -929,7 +1031,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 	/**
 		\brief Move buffer is available.
 
-		This field indicates the Node can receive additional move commands which will be stored in the Node's move buff.
+		This field indicates the Node can receive additional move commands which will be stored in the Node's move buffer.
 		If this bit is deasserted, any move command sent to the Node will be ignored.
 
 		\remark
@@ -947,9 +1049,19 @@ struct PACK_BYTES _cpmStatusRegFlds {
 		autonomous handling.
 	**/
 	BFld Ready						: 1;    // 04
-													/** \cond INTERNAL_DOC **/
-	BFld 							: 1;	// 05
-													/** \endcond **/
+
+	/**
+		\brief Power Event Occurred.
+
+		This field is asserted when a power event occurs. The power status
+		register can be used to determine the specifics.
+
+		\remark
+		This field can generate an attention request to the host for
+		autonomous handling.
+	**/
+	BFld PowerEvent					: 1;	// 05
+
 	/**
 		\brief Alert Present.
 
@@ -1010,7 +1122,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 		Indicates that a homing sequence is being
 		executed.	
 
-		\see HomingPage for more information on homing
+		\see [Homing Page](@ref HomingPage) for more information on homing
 
 		\remark This field can generate an attention request to the host for
 		autonomous handling. 
@@ -1066,7 +1178,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 
 		This field asserts when a Move is complete.
 
-		\see CPMmoveDonePage
+		\see \ref CPMmoveDonePage
 
 		\remark This field can generate an attention request to the host for
 		autonomous handling.
@@ -1077,7 +1189,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 
 		This field indicates the Node is currently not tracking within the In-Range window.  This is especially common during moves.
 
-		\see CPMmoveDonePage for more information regarding setting up the In-Range window in ClearView
+		\see \ref CPMmoveDonePage for more information regarding setting up the In-Range window in ClearView
 
 		\remark This field can generate an attention request to the host for
 		autonomous handling.
@@ -1176,7 +1288,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 	/**
 		\brief Drive is disabled.
 
-		This field asserts when the power amplifier is disabled.
+		This field asserts when the drive is disabled.
 
 		\remark This field can generate an attention request to the host for
 		autonomous handling.
@@ -1231,7 +1343,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 		\brief Fan running.
 
 		For units with a fan, this field is asserted when the
-		fan is on. This is a warning that the ambient or internal
+		fan is on. This is a warning that the drive
 		temperature is approaching the shutdown level.
 	**/
 	BFld FanOn           			: 1;	// 36 
@@ -1241,6 +1353,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 
 		This field asserted when the vector has not been finalized.  
 		Typically, this happens on the first enable after power-up.
+		Once the vector is finalized normal operation can commence.
 	**/
 	BFld VectorSearch    			: 1;	// 37 
 	/**
@@ -1264,8 +1377,10 @@ struct PACK_BYTES _cpmStatusRegFlds {
 		\brief Shutdown state.
 
 		These fields describes the shutdown condition of the node:
-		- 0: Shutdown State Idle
-		- 3: Shutdown State Stopped
+		- 0: Idle: no shutdowns are present
+		- 1: Delay: A shutdown is imminent 
+		- 2: Ramp: Node is ramping down to zero speed
+		- 3: Stopped: Node is currently shutdown
 	**/
 	// Avoid VS compiler padding bug, don't use enum
 	BFld ShutdownState				: 2;	// 40-41
@@ -1289,7 +1404,7 @@ struct PACK_BYTES _cpmStatusRegFlds {
 		\brief This field is set true when the step+direction inputs are
 		active.
 
-		This field is set true when the step+direction inputs are
+		This field is set true when the step and direction inputs are
 		active.
 	**/
 	BFld StepsActive     			: 1;	// 44
@@ -1369,6 +1484,18 @@ union PACK_BYTES _cpmStatusReg {
 		\brief Access to the fields of the ClearPath-SC <i>Status Register</i>.
 	**/
 	cpmStatusRegFlds Fld;
+
+#ifdef __cplusplus
+
+	// Constructor, create with bits cleared
+	_cpmStatusReg() {                   // Clear bits on construction
+		bits[0] = 0;
+		bits[1] = 0;
+		bits[2] = 0;
+	}
+#endif
+
+
 };
 /// ClearPath-SC Status Register Type
 typedef union _cpmStatusReg cpmStatusReg;
@@ -1400,18 +1527,8 @@ struct PACK_BYTES _cpmAlertFlds {
     //                              |len|bit #|description                 |
     //                              ----------------------------------------
 									/** \cond INTERNAL_DOC **/
-	BFld : 3; /* 32-34 */
+	BFld : 4; /* 32-35 */
 									 /** \endcond **/
-	/**
-	\brief Move target is out of range.
-
-	A move command is attempting to move too far. This move
-	is canceled.  Attempted moves longer than 8,388,608 cnts will trigger this alert.
-
-	Remedies:
-	- Break up the move into smaller pieces.
-	**/
-	BFld MoveGenRange : 1; /* 35 */
 											   /** \cond INTERNAL_DOC **/
 	/**
 	\brief Jerk Limit Bad.
@@ -1504,8 +1621,44 @@ struct PACK_BYTES _cpmAlertFlds {
 								/** \cond INTERNAL_DOC **/
 								// Note: Must be separate around word boundary
 	BFld : 5; /* 43-47 */
-	BFld : 10;/* 48-57 */
-								
+	BFld : 4; /* 48-51 */
+								/** \endcond **/
+	/**
+	\brief AC Power Lost
+
+	Motor was running with AC power and AC power has been removed.
+
+	Remedies:
+	- Check AC power wiring and power quality to attached modules.
+	**/
+	BFld ACPowerLost		    : 1; /* 52 */ // AC Power lost
+	/**
+	\brief AC Phase Lost
+
+	Motor was running with AC power and one or more of the AC phases have been removed.
+
+	Remedies:
+	- Check AC power wiring and power quality to attached modules.
+	**/
+	BFld ACPhaseLost		    : 1; /* 53 */ // AC Phase lost
+								/** \cond INTERNAL_DOC **/
+	BFld : 1; /* 54 */
+								/** \endcond **/
+	/**
+	\brief Low motor temperature.
+
+	The motor has detected an excessive operating
+	temperature. This condition is recoverable when the
+	temperature has been sufficiently reduced.
+
+	Remedies:
+	- Move the motor to a warmer environment.
+	**/
+	BFld MtrTempLow				: 1; /* 55 */
+								/** \cond INTERNAL_DOC **/
+	BFld : 2; /* 56-57 */
+								/** \endcond **/
+
 	/**
 	\brief Vector Problem.
 
@@ -1518,6 +1671,7 @@ struct PACK_BYTES _cpmAlertFlds {
 	- Replace defective motor.
 	**/
 	BFld MtrVectorBad : 1; /* 58 */
+	/** \cond INTERNAL_DOC **/
 							
 	BFld : 1; /* 59 */
 							/** \endcond **/
@@ -1598,7 +1752,7 @@ struct PACK_BYTES _cpmAlertFlds {
 	Remedies:
 	- Check the mechanics for abnormally high friction/binding. Grease if necessary.
 	- Reduce velocity, acceleration, and/or duty cycle.
-	- Check the the configuration file is appropriate for this motor.
+	- Check that the configuration file is appropriate for this motor.
 	- Increase tracking error limit to a higher value through the ClearView application.
 
 	**/
@@ -1627,7 +1781,7 @@ struct PACK_BYTES _cpmAlertFlds {
 	Remedies:
 	- Check the mechanics for abnormally high friction/binding.
 	- Reduce velocity, acceleration, and/or duty cycle.
-	- Check the the configuration file is appropriate for this motor.
+	- Check that the configuration file is appropriate for this motor.
 	- If the motor is actively cooled with a fan raise the continuous current limit of the motor appropriately
 	- Use a larger motor.
 	**/
@@ -1728,20 +1882,29 @@ struct PACK_BYTES _cpmAlertFlds {
 	BFld IndexCountZeroWarn : 1; /* 79 */
 								 /** \endcond  **/
 	/**
-	\brief High ambient temperature.
+	\brief High Drive temperature.
 
-	The motor has detected an excessive ambient operating
+	The motor has detected an excessive operating
 	temperature. This condition is recoverable when the
 	temperature has been sufficiently reduced.
 
 	Remedies:
 	- Provide more ventilation/fan cooling to motor.
-	- See system configuration manual for more tips on this condition.
 	**/
-	BFld TempAmbientHigh : 1; /* 80 */
-							/** \cond INTERNAL_DOC **/
-	BFld : 1; /* 81 */
-							/** \endcond **/
+	BFld DriveTempHigh : 1; 	/* 80 */
+
+	/**
+	\brief Stator temperature.
+
+	The motor has detected an excessive motor stator operating
+	temperature. This condition is recoverable when the
+	temperature has been sufficiently reduced.
+
+	Remedies:
+	- Provide more ventilation/fan cooling to motor.
+	**/
+	BFld StatorTempHigh	: 1; /* 81 */
+
 	/**
 	\brief Motor's bus power supply overloaded.
 
@@ -1792,7 +1955,7 @@ struct PACK_BYTES _cpmAlertFlds {
 	- Reduce motion duty cycle, acceleration, or load.
 	**/
 	BFld BusRMSOverload : 1; /* 85 */
-								/** \cond INTERNAL_DOC **/
+													/** \cond INTERNAL_DOC **/
 	BFld : 1; /* 86 */
 	/**
 	\brief MtrEncIndexMissing
@@ -1806,23 +1969,24 @@ struct PACK_BYTES _cpmAlertFlds {
 	**/
 	BFld MtrEncIndexMissing : 1; /* 87 */
 	
-	BFld : 1; /* 88 */
-								/** \endcond **/
 	/**
-	\brief  Brown-out during sensorless startup.
+	 * \brief Bus Voltage under Minimum Operating Voltage
+	 *
+	 * The motor's bus voltage has drooped below the user-defined operating voltage.
+	 *
+	 * Remedies:
+	 *  - Check that the Minimum Operating Voltage parameter is set correctly
+	 * 	- Check that the power supply has been correctly configured
+	 *  for your voltage and is producing the expected voltage level.
+	 *  - Check the mechanics for abnormally high friction/binding. Grease if necessary.
+	 */
+	BFld BusVoltageUnderOperatingV : 1; /* 88 */
 
-	This shutdown occurs when the sensorless startup failed
-	due to low bus voltage.
-
-	Remedies:
-	- Verify that the configuration file is correct for the motor;
-	reload the configuration file.
-	- For systems with multiple motors, enable the motors individually when enabling for the first time after power-up. 
-
-	**/
-	BFld NoCommBusLow : 1; /* 89 */
-							/** \cond INTERNAL_DOC **/
+	BFld : 1; /* 89 */
+													/** \endcond **/
+													/** \cond INTERNAL_DOC **/
 	BFld : 3; /* 90-92 */
+													/** \endcond **/
 	/**
 	\brief MtrEncIndexMisplaced
 
@@ -1834,22 +1998,18 @@ struct PACK_BYTES _cpmAlertFlds {
 	- Replace defective motor
 	**/
 	BFld MtrEncIndexMisplaced : 1; /* 93 */
-								   
 	/**
-	\brief BusVoltageLowSinglePhase
+	\brief StepsDuringPosnRecovery
 
-	Using a single-phase power source, the motion caused an internal
-	bus brown-out.
+	Step input commands were seen during the position recovery operation.
 
-	Appears in: AlertReg, WarnReg
+	Appears in: AlertReg
 
 	Remedies:
-	- Use less aggressive move profiles
-	- Consider using three-phase power source
-	- Consider using a DC power bus
-	- Fix stiffness of the single-phase power source. Loose connection?
+	- Check that power supply is producing the expected voltage level.
+	- Do not send steps until the motor is ready
 	**/
-	BFld BusVoltageLowSinglePhase : 1; /* 94 */
+	BFld StepsDuringPosnRecovery : 1; /* 94 */
 
 	/**
 	\brief Create a new line delimited string of the alerts set.
@@ -2063,6 +2223,8 @@ union PACK_BYTES _cpmTuneConfigReg {
 		BFld DataCollectFreeRunApp	: 1;	// 14 Data collector free runs on App
 													
 		BFld DataCollectFreeRunDiag	: 1;	// 15 Data collector free runs on Diag
+
+		BFld VelocityCompensatorOverride : 1; // 16 Velocity Compensator Override
 													
     };                               
 	/**
@@ -2156,6 +2318,18 @@ typedef struct _cpmSetFlagsFlds {
 typedef union _cpmSetFlagsReg {
 	Uint16 bits;
 	cpmSetFlagsFlds fld;
+
+	/// Clear bits on construction
+#ifdef __cplusplus
+#ifndef __TI_COMPILER_VERSION__
+
+	/// Clear bits on construction
+	_cpmSetFlagsReg() {
+		bits = 0;
+	}
+
+#endif
+#endif
 } cpmSetFlagsReg;
 
 												/** \endcond **/
@@ -2166,7 +2340,7 @@ typedef union _cpmSetFlagsReg {
 #pragma pack(pop)
 #endif
 //*****************************************************************************
-#endif // __PUBCMP_REGS_H__
+#endif // __PUBCPM_REGS_H__
 //============================================================================= 
 //	END OF FILE pubCpmRegs.h
 //=============================================================================

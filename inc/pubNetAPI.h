@@ -15,7 +15,7 @@
 //		2015-12-02 16:32:18
 // 
 // COPYRIGHT NOTICE:
-//		(C)Copyright 2015  Teknic, Inc.  All rights reserved.
+//		(C)Copyright 2015-2018  Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification, 
 //		or portion thereof merged into another program. A copy of the 
@@ -89,7 +89,7 @@ typedef Uint16 netaddr;			// Net number (a.k.a. cNum)
 /**
 	\brief This enumeration describes the port open state. 
 	
-	Operations to nodes maybe performed when the port is in the OPENED_ONLINE
+	Operations to nodes may be performed when the port is in the OPENED_ONLINE
 	state.
 **/
 typedef enum _openStates {
@@ -259,6 +259,7 @@ struct MN_EXPORT _portSpec {
 		_portSpec() {
 			PortRate = MN_BAUD_12X;
 			PortName[0] = 0;
+			PortType = UNKNOWN_NODES;
 		}
 		/**
 			\brief Convenience Constructor

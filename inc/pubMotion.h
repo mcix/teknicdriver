@@ -22,7 +22,7 @@
 //      09/24/2009 16:56:34 Refactored from iCmdController.h
 //
 // COPYRIGHT NOTICE:
-//      (C)Copyright 2008-2011 Teknic, Inc.  All rights reserved.
+//      (C)Copyright 2008-2018 Teknic, Inc.  All rights reserved.
 //
 //      This copyright notice must be reproduced in any copy, modification,
 //      or portion thereof merged into another program. A copy of the
@@ -130,7 +130,7 @@ typedef union _mgPosnStyle {
     mgPosnStyles styleCode;         // Move style
     /// Field oriented style selectors
     struct {
-        int     relative    :1;     ///< Relative moves
+        unsigned	relative    :1;     ///< Relative moves
 		/**
 			Wait for Trigger
 
@@ -140,13 +140,13 @@ typedef union _mgPosnStyle {
 
 			\see \ref netTrigger
 		**/
-        int     wait        :1;
-        int     dwell       :1;     ///< Create post move dwell
-        int     asym        :1;     ///< Absolute moves
-        int     tail        :1;     ///< Tail section
-        int     head        :1;     ///< Head section
-		int		repeat		:1;		///< Cause move to repeat/dwell
-		int		reciprocate :1;		///< Reciprocating moves/repeat
+        unsigned	wait        :1;
+        unsigned	dwell       :1;     ///< Create post move dwell
+        unsigned	asym        :1;     ///< Absolute moves
+        unsigned	tail        :1;     ///< Tail section
+        unsigned	head        :1;     ///< Head section
+		unsigned	repeat		:1;		///< Cause move to repeat/dwell
+		unsigned	reciprocate :1;		///< Reciprocating moves/repeat
     } fld;                          ///< Field access to move styles.
     #ifdef __cplusplus
         /// Useful converter to convert integer code to style container.
@@ -160,7 +160,7 @@ typedef union _mgPosnStyle {
 // Structure based move API
 typedef struct _mgMoveProfiledInfo {
     mgPosnStyles    type;           // Motion style: trap,head,tail, etc.
-    int32           value;          // Position Target (based on style)
+    nodelong           value;       // Position Target (based on style)
     #ifdef __cplusplus
         _mgMoveProfiledInfo() {type = MG_MOVE_STYLE_NORM;}
     #endif
@@ -233,7 +233,7 @@ typedef union _mgVelStyle {
 
 			\note This field is used only when \c skyline field is set.
 		**/
-        int absolute	:1; 
+        unsigned absolute	:1; 
 		/**
 			Trigger Move.
 
@@ -243,7 +243,7 @@ typedef union _mgVelStyle {
 
 			\see \ref netTrigger
 		**/
-        int wait		:1;     // Wait for trigger
+        unsigned wait		:1;     // Wait for trigger
 		/**
 			Skyline Move.
 
@@ -267,14 +267,14 @@ typedef union _mgVelStyle {
 			segment specifies the end position as an absolute position versus
 			relative to the start of the move.
 		**/
-        int skyline		:1;     // Skyline move segment
+        unsigned skyline		:1;     // Skyline move segment
         /**
          * 	Suppress Tracking Shutdown
          *
          * 	This field tells the drive to ignore positional tracking
          * 	errors.
          */
-        int noTrackingShutdown	:1;
+        unsigned noTrackingShutdown	:1;
 
     } styles;					///< Style type bit fields.
 														/** \endcond **/

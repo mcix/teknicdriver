@@ -15,7 +15,7 @@
 //								  products
 //
 // COPYRIGHT NOTICE:
-//		(C)Copyright 1998-2010  Teknic, Inc.  All rights reserved.
+//		(C)Copyright 1998-2018  Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification, 
 //		or portion thereof merged into another program. A copy of the 

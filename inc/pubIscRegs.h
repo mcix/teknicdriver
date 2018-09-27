@@ -1,6 +1,6 @@
 //*****************************************************************************
-// $Archive: /ClearPath SC-1.0.123/User Driver/inc/pubIscRegs.h $
-// $Revision: 103 $ $Date: 12/09/16 3:58p $
+// $Archive: /ClearPath SC/User Driver/inc/pubIscRegs.h $
+// $Revision: 104 $ $Date: 12/13/16 12:15p $
 // $Workfile: pubIscRegs.h $
 //
 // DESCRIPTION:
@@ -22,7 +22,7 @@
 //      03/13/1998 13:29:19
 //
 // COPYRIGHT NOTICE:
-//      (C)Copyright 1998-2010  Teknic, Inc.  All rights reserved.
+//      (C)Copyright 1998-2018  Teknic, Inc.  All rights reserved.
 //
 //      This copyright notice must be reproduced in any copy, modification,
 //      or portion thereof merged into another program. A copy of the
@@ -1228,8 +1228,7 @@ typedef struct _iscPlaInFlds {
 		\see \ref ISCgpTimerPage
     **/
     BFld TimerExpired   : 1;    // 15 31: timer expired
-	// TOKILL or use directly
-	//ClearPathPlaInReg ClrPathFld;
+	
 } iscPlaInFlds;
 /// \endcond                                                                  *
 //*****************************************************************************

@@ -16,7 +16,7 @@
 //		05/17/2007 15:13:46
 //
 // COPYRIGHT NOTICE:
-//		(C)Copyright 2007-2013 Teknic, Inc.  All rights reserved.
+//		(C)Copyright 2007-2018 Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification,
 //		or portion thereof merged into another program. A copy of the
@@ -149,7 +149,6 @@ typedef int32 nodelong;			// Signed 32-bit item
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // String and character definitions
-// 		TODO decide on UNICODE .vs. ANSI on Linux platforms
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if defined(_WIN32)||defined(_WIN64)

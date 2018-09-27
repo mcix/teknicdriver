@@ -1,6 +1,6 @@
 //*****************************************************************************
 // $Archive: /ClearPath SC/User Driver/inc/pubSysCls.h $
-// $Revision: 92 $ $Date: 12/12/16 3:01p $
+// $Date: 01/19/2017 17:39 $
 // $Workfile: pubSysCls.h $
 //
 // DESCRIPTION:
@@ -10,7 +10,7 @@
 
 	sFoundation 2.0 software framework for host programming a system
 	of ClearPath-SC nodes. This framework implements a rich class library
-	for interacting with the nodes via C++.
+	for interacting with the nodes via C++.ZSFzsdfzdzd
 **/
 // PRINCIPLE AUTHORS:
 //		DWS
@@ -19,7 +19,7 @@
 //		2015-12-08 12:36:45
 // 
 // COPYRIGHT NOTICE:
-//		(C)Copyright 2015-2016 Teknic, Inc.  All rights reserved.
+//		(C)Copyright 2015-2018 Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification, 
 //		or portion thereof merged into another program. A copy of the 
@@ -37,6 +37,7 @@
 //
 #include "tekTypes.h"
 #include "pubCoreRegs.h"
+#include "pubPwrReg.h"
 #include "pubNetAPI.h"
 
 // Use C++ lib strings
@@ -101,6 +102,7 @@ class MN_EXPORT IObj
 {
 													/** \cond INTERNAL_DOC **/	
 	friend class CPMinfo;
+	friend class CPMnode;
 													/** \endcond **/
 public:
 	/**
@@ -111,7 +113,7 @@ public:
 		A programmatic way of determining if this node supports this feature.
 		Some features are not available on certain types of nodes.
 	**/
-	bool Supported();
+	virtual bool Supported();
 
 													/** \cond INTERNAL_DOC **/	
 private:
@@ -155,7 +157,7 @@ public:
 
 		\CODE_SAMPLE_HDR
 		// Access another feature from another feature
-		myStatusObj.Node().Outs.EnableReq(false));
+		myStatusObj.Node().EnableReq(false));
 		\endcode
 	**/
 	INode &Node() { return *m_pNode; }
@@ -254,7 +256,7 @@ public:
 
 		Determine the parameter's existence.
 
-		This is a helpful function when a mixture of node types maybe in
+		This is a helpful function when a mixture of node types may be in
 		a system an some models may not support certain parameters.
 
 		\return True if the underlying parameter exists for this node.
@@ -538,6 +540,126 @@ public:
 		\endcode
 	**/
 	double Value(bool getNonVolatile = false);
+
+	/** \cond INTERNAL_DOC **/
+	// - - - - - - - - - - - - - - - - - - -
+	// Common overrides for signed integers
+	// - - - - - - - - - - - - - - - - - - -
+	double operator|(int32_t arg) {
+		return(operator int32_t() | arg);
+	}
+	double operator&(int32_t arg) {
+		return(operator int32_t() & arg);
+	}
+	double operator^(int32_t arg) {
+		return(operator int32_t() ^ arg);
+	}
+	double operator+(int32_t arg) {
+		return(operator double() + arg);
+	}
+	double operator-(int32_t arg) {
+		return(operator double() - arg);
+	}
+	double operator*(int32_t arg) {
+		return(operator double() * arg);
+	}
+	double operator/(int32_t arg) {
+		return(operator double() / arg);
+	}
+	double operator|=(int32_t arg) {
+		return(operator=(operator|(arg)));
+	}
+	double operator&=(int32_t arg) {
+		return(operator=(operator&(arg)));
+	}
+	double operator^=(int32_t arg) {
+		return(operator=(operator^(arg)));
+	}
+	double operator+=(int32_t arg) {
+		return(operator=(operator+(arg)));
+	}
+	double operator-=(int32_t arg) {
+		return(operator=(operator-(arg)));
+	}
+	double operator*=(int32_t arg) {
+		return(operator=(operator*(arg)));
+	}
+	double operator/=(int32_t arg) {
+		return(operator=(operator/(arg)));
+	}
+	
+	// - - - - - - - - - - - - - - - - - - -
+	// Common overrides for unsigned integers
+	// - - - - - - - - - - - - - - - - - - -
+	double operator|(uint32_t arg) {
+		return(operator uint32_t() | arg);
+	}
+	double operator&(uint32_t arg) {
+		return(operator uint32_t() & arg);
+	}
+	double operator^(uint32_t arg) {
+		return(operator uint32_t() ^ arg);
+	}
+	double operator+(uint32_t arg) {
+		return(operator double() + arg);
+	}
+	double operator-(uint32_t arg) {
+		return(operator double() - arg);
+	}
+	double operator*(uint32_t arg) {
+		return(operator double() * arg);
+	}
+	double operator/(uint32_t arg) {
+		return(operator double() / arg);
+	}
+	double operator|=(uint32_t arg) {
+		return(operator=(operator|(arg)));
+	}
+	double operator&=(uint32_t arg) {
+		return(operator=(operator&(arg)));
+	}
+	double operator^=(uint32_t arg) {
+		return(operator=(operator^(arg)));
+	}
+	double operator+=(uint32_t arg) {
+		return(operator=(operator+(arg)));
+	}
+	double operator-=(uint32_t arg) {
+		return(operator=(operator-(arg)));
+	}
+	double operator*=(uint32_t arg) {
+		return(operator=(operator*(arg)));
+	}
+	double operator/=(uint32_t arg) {
+		return(operator=(operator/(arg)));
+	}
+
+	// Common overrides for doubles
+	double operator+(double arg) {
+		return(operator double() + arg);
+	}
+	double operator-(double arg) {
+		return(operator double() - arg);
+	}
+	double operator*(double arg) {
+		return(operator double() * arg);
+	}
+	double operator/(double arg) {
+		return(operator double() / arg);
+	}
+	double operator+=(double arg) {
+		return(operator=(operator+(arg)));
+	}
+	double operator-=(double arg) {
+		return(operator=(operator-(arg)));
+	}
+	double operator*=(double arg) {
+		return(operator=(operator*(arg)));
+	}
+	double operator/=(double arg) {
+		return(operator=(operator/(arg)));
+	}
+	/** \endcond **/
 protected:
 													/** \cond INTERNAL_DOC **/
 	// Construction to wire to our node object
@@ -717,6 +839,124 @@ public:
 		parameter as the memory has a write count limitation.
 	**/
 	int32_t Value(bool getNonVolatile=false);
+	/** \cond INTERNAL_DOC **/
+	// - - - - - - - - - - - - - - - - - - -
+	// Common overrides for signed integers
+	// - - - - - - - - - - - - - - - - - - -
+	int32_t operator|(int32_t arg) {
+		return(operator int32_t() | arg);
+	}
+	int32_t operator&(int32_t arg) {
+		return(operator int32_t() & arg);
+	}
+	int32_t operator^(int32_t arg) {
+		return(operator int32_t() ^ arg);
+	}
+	int32_t operator+(int32_t arg) {
+		return(operator int32_t() + arg);
+	}
+	int32_t operator-(int32_t arg) {
+		return(operator int32_t() - arg);
+	}
+	int32_t operator*(int32_t arg) {
+		return(operator int32_t() * arg);
+	}
+	int32_t operator/(int32_t arg) {
+		return(operator int32_t() / arg);
+	}
+	int32_t operator|=(int32_t arg) {
+		return operator=(operator|(arg));
+	}
+	int32_t operator&=(int32_t arg) {
+		return operator=(operator&(arg));
+	}
+	int32_t operator^=(int32_t arg) {
+		return operator=(operator^(arg));
+	}
+	int32_t operator+=(int32_t arg) {
+		return operator=(operator+(arg));
+	}
+	int32_t operator-=(int32_t arg) {
+		return operator=(operator-(arg));
+	}
+	int32_t operator*=(int32_t arg) {
+		return operator=(operator*(arg));
+	}
+	int32_t operator/=(int32_t arg) {
+		return operator=(operator/(arg));
+	}
+
+	// Common overrides for unsigned integers
+	
+	int32_t operator|(uint32_t arg) {
+		return(operator int32_t() | arg);
+	}
+	int32_t operator&(uint32_t arg) {
+		return(operator int32_t() & arg);
+	}
+	int32_t operator^(uint32_t arg) {
+		return(operator int32_t() ^ arg);
+	}
+	int32_t operator+(uint32_t arg) {
+		return(operator int32_t() + arg);
+	}
+	int32_t operator-(uint32_t arg) {
+		return(operator int32_t() - arg);
+	}
+	int32_t operator*(uint32_t arg) {
+		return(operator int32_t() * arg);
+	}
+	int32_t operator/(uint32_t arg) {
+		return(operator int32_t() / arg);
+	}
+	int32_t operator|=(uint32_t arg) {
+		return operator=(operator|(arg));
+	}
+	int32_t operator&=(uint32_t arg) {
+		return operator=(operator&(arg));
+	}
+	int32_t operator^=(uint32_t arg) {
+		return operator=(operator^(arg));
+	}
+	int32_t operator+=(uint32_t arg) {
+		return operator=(operator+(arg));
+	}
+	int32_t operator-=(uint32_t arg) {
+		return operator=(operator-(arg));
+	}
+	int32_t operator*=(uint32_t arg) {
+		return operator=(operator*(arg));
+	}
+	int32_t operator/=(uint32_t arg) {
+		return operator=(operator/(arg));
+	}
+
+	// Common overrides for doubles
+	double operator+(double arg) {
+		return(operator int32_t() + arg);
+	}
+	double operator-(double arg) {
+		return(operator int32_t() - arg);
+	}
+	double operator*(double arg) {
+		return(operator int32_t() * arg);
+	}
+	double operator/(double arg) {
+		return(operator int32_t() / arg);
+	}
+	int32_t operator+=(double arg) {
+		return operator=(static_cast<int32_t>(operator+(arg)));
+	}
+	int32_t operator-=(double arg) {
+		return operator=(static_cast<int32_t>(operator-(arg)));
+	}
+	int32_t operator*=(double arg) {
+		return operator=(static_cast<int32_t>(operator*(arg)));
+	}
+	int32_t operator/=(double arg) {
+		return operator=(static_cast<int32_t>(operator/(arg)));
+	}
+	/** \endcond **/
 
 protected:
 													/** \cond INTERNAL_DOC **/
@@ -753,12 +993,12 @@ protected:
 	// Making a copy of a value. This copy will run independently of the
 	// node's reference. For example, myCopy.Refresh() will only
 	// update myCopy's internal value.
-	ValueSigned myCopy = myNode.someFeature.someParameter;
+	ValueUnsigned myCopy = myNode.someFeature.someParameter;
 
 	// Making a short-cut reference. This sometimes can reduce the typing
 	// requirements for using a parameter. In this example, aRef for
 	// all intents and purposes is the same as myNode.aFeature.aParameter.
-	ValueSigned &myRef = myNode.someFeature.someParameter;
+	ValueUnsigned &myRef = myNode.someFeature.someParameter;
 	myRef.Refresh();
 	// is the same as
 	myNode.someFeature.someParameter.Refresh();
@@ -885,6 +1125,124 @@ public:
 		parameter as the memory has a write count limitation.
 	**/
 	uint32_t Value(bool getNonVolatile = false);
+	/** \cond INTERNAL_DOC **/
+	// - - - - - - - - - - - - - - - - - - -
+	// Common overrides for signed integers
+	// - - - - - - - - - - - - - - - - - - -
+	uint32_t operator|(int32_t arg) {
+		return(operator uint32_t() | arg);
+	}
+	uint32_t operator&(int32_t arg) {
+		return(operator uint32_t() & arg);
+	}
+	uint32_t operator^(int32_t arg) {
+		return(operator uint32_t() ^ arg);
+	}
+	uint32_t operator+(int32_t arg) {
+		return(operator uint32_t() + arg);
+	}
+	uint32_t operator-(int32_t arg) {
+		return(operator uint32_t() - arg);
+	}
+	uint32_t operator*(int32_t arg) {
+		return(operator uint32_t() * arg);
+	}
+	uint32_t operator/(int32_t arg) {
+		return(operator uint32_t() / arg);
+	}
+	uint32_t operator|=(int32_t arg) {
+		return operator=(operator|(arg));
+	}
+	uint32_t operator&=(int32_t arg) {
+		return operator=(operator&(arg));
+	}
+	uint32_t operator^=(int32_t arg) {
+		return operator=(operator^(arg));
+	}
+	uint32_t operator+=(int32_t arg) {
+		return operator=(operator+(arg));
+	}
+	uint32_t operator-=(int32_t arg) {
+		return operator=(operator-(arg));
+	}
+	uint32_t operator*=(int32_t arg) {
+		return operator=(operator*(arg));
+	}
+	uint32_t operator/=(int32_t arg) {
+		return operator=(operator/(arg));
+	}
+
+	// Common overrides for unsigned integers
+	
+	uint32_t operator|(uint32_t arg) {
+		return(operator uint32_t() | arg);
+	}
+	uint32_t operator&(uint32_t arg) {
+		return(operator uint32_t() & arg);
+	}
+	uint32_t operator^(uint32_t arg) {
+		return(operator uint32_t() ^ arg);
+	}
+	uint32_t operator+(uint32_t arg) {
+		return(operator uint32_t() + arg);
+	}
+	uint32_t operator-(uint32_t arg) {
+		return(operator uint32_t() - arg);
+	}
+	uint32_t operator*(uint32_t arg) {
+		return(operator uint32_t() * arg);
+	}
+	uint32_t operator/(uint32_t arg) {
+		return(operator uint32_t() / arg);
+	}
+	uint32_t operator|=(uint32_t arg) {
+		return operator=(operator|(arg));
+	}
+	uint32_t operator&=(uint32_t arg) {
+		return operator=(operator&(arg));
+	}
+	uint32_t operator^=(uint32_t arg) {
+		return operator=(operator^(arg));
+	}
+	uint32_t operator+=(uint32_t arg) {
+		return operator=(operator+(arg));
+	}
+	uint32_t operator-=(uint32_t arg) {
+		return operator=(operator-(arg));
+	}
+	uint32_t operator*=(uint32_t arg) {
+		return operator=(operator*(arg));
+	}
+	uint32_t operator/=(uint32_t arg) {
+		return operator=(operator/(arg));
+	}
+
+	// Common overrides for doubles
+	double operator+(double arg) {
+		return(operator uint32_t() + arg);
+	}
+	double operator-(double arg) {
+		return(operator uint32_t() - arg);
+	}
+	double operator*(double arg) {
+		return(operator uint32_t() * arg);
+	}
+	double operator/(double arg) {
+		return(operator uint32_t() / arg);
+	}
+	uint32_t operator+=(double arg) {
+		return operator=(static_cast<uint32_t>(operator+(arg)));
+	}
+	uint32_t operator-=(double arg) {
+		return operator=(static_cast<uint32_t>(operator-(arg)));
+	}
+	uint32_t operator*=(double arg) {
+		return operator=(static_cast<uint32_t>(operator*(arg)));
+	}
+	uint32_t operator/=(double arg) {
+		return operator=(static_cast<uint32_t>(operator/(arg)));
+	}
+	/** \endcond **/
 
 protected:
 													/** \cond INTERNAL_DOC **/
@@ -913,20 +1271,20 @@ protected:
 	myNode.someFeature.someParameter = 12345;
 
 	// Getting a value
-	uint32_t myVal = myNode.someFeature.someParameter;
+	String myVal = myNode.someFeature.someParameter;
 
 	// Using a parameter in a calculation
-	uint32_t myCalVal = myNode.someFeature.someParameter.Value() + 1000;
+	String myCalVal = myNode.someFeature.someParameter.Value() + 1000;
 
 	// Making a copy of a value. This copy will run independently of the
 	// node's reference. For example, myCopy.Refresh() will only
 	// update myCopy's internal value.
-	ValueSigned myCopy = myNode.someFeature.someParameter;
+	ValueString myCopy = myNode.someFeature.someParameter;
 
 	// Making a short-cut reference. This sometimes can reduce the typing
 	// requirements for using a parameter. In this example, aRef for
 	// all intents and purposes is the same as myNode.aFeature.aParameter.
-	ValueSigned &myRef = myNode.someFeature.someParameter;
+	ValueString &myRef = myNode.someFeature.someParameter;
 	myRef.Refresh();
 	// is the same as
 	myNode.someFeature.someParameter.Refresh();
@@ -1292,12 +1650,12 @@ protected:
 /**
 	\brief Alert Type Register Node Parameter Access Object.
 
-	This class object implements access to the alert register, and the attentionable alert mask within the
+	This class object implements access to the alert register and the attentionable alert mask within the
 	node.
 
 	The motor's firmware and hardware contains many mechanisms to protect
-	the motor, and the application from problems that may occur. When
-	an operation-blocking condition occurs, it is known as an <i>Alert</i> or
+	the motor and the application from problems that may occur. When
+	an operation-blocking condition occurs, it is known as an <i>Alert</i>, or
 	sometimes called a <i>Shutdown</i>. The shutdown is logged in the
 	non-volatile memory with a time-stamp for review with the ClearView application.
 	These alerts are stored locally within the node in a ninety-six bit [alertReg](@ref alertReg) struct.
@@ -1479,6 +1837,132 @@ protected:
 
 //*****************************************************************************
 // NAME																	      *
+// 	ValuePowerReg class
+/**
+\brief Power Status Register Node Parameter Access Object.
+
+This class object implements access to the power state register.
+
+The motor's firmware monitors the power connections continuously. This
+register shows the currently detected connections and any anomalies detected
+during operations. These include loose phase wiring and which terminals
+the power is attached to.
+
+The following is an example
+
+\todo see
+\CODE_SAMPLE_HDR
+
+//This example code will check and return the current power conditions and
+//print out the state string of any issues found.
+
+//This creates an Empty String for us to put our state string into
+char pwrInfo[256];
+
+// get a reference to our ValuePowerReg Object
+ValuePowerReg &myPower = myNode.Status.Power;
+
+// Refresh the Real-Time Status, and Alert Register
+theNode.Status.Power.Refresh();
+myPower.Refresh();
+
+
+// Check that there has been no disruptions in the AC supply.
+// The bit is set true if there are alerts in the alert register
+if (theNode.Status.Power.Value().fld.InBusLoss)
+{
+printf("Node's power bus has been removed!\n");
+}
+else
+{
+printf("Node has no bus supply problems!\n");
+}
+
+// Put a text description of all alert bits set into our empty string, then print the string
+myNodesAlerts.Value().StateStr(pwrInfo, 256);
+printf("Node power state: %s", pwrInfo);
+
+
+\endcode
+
+\see _mnPowerFlds for a complete list of Possible Alerts
+**/
+class MN_EXPORT ValuePowerReg : public ValueBase
+{
+	/** \cond INTERNAL_DOC **/
+	friend class IStatus;
+	friend class IAttnNode;
+private:
+	mnPowerReg m_lastValue;
+	mnPowerReg m_currentValue;
+	mnPowerReg m_testResult;
+	bool m_clearOnRead;
+	/** \endcond **/
+public:
+	/**
+	\brief Query the node for a new copy of the underlying alert register.
+
+	This function will update the stored value to reflect current state
+	of the node's Alert Register.
+	**/
+	void Refresh();
+	/** \cond INTERNAL_DOC **/
+	/**
+	\brief Read, Accumulate and Test and Clear Accumulated Power Type
+	Register state.
+
+	\param[in] mask Fields to test for
+	\param[out] result Fields that were cleared
+	\return true if one or more were true
+
+	This function is a thread safe way of atomically testing and clearing
+	fields from accumulating <i>Power Status Register</i>. The /a result
+	union is updated with all the fields detected by the mask. This is useful
+	when testing multiple fields.
+	**/
+	bool TestAndClear(const mnPowerReg &mask, mnPowerReg &result);
+
+	/**
+	\brief Clear the accumulated state
+
+	This function is used to clear out the accumulated status information from
+	the internal copy.
+	**/
+	void Clear();
+	/** \endcond  **/
+
+	/**
+	\brief Copy operator to return a copy of the current power type register.
+
+	Copy operator to return a copy of the current power type register.
+	**/
+	operator mnPowerReg();
+
+	/**
+	\brief Return a copy of the last acquired power Type Register.
+
+	Copy operator to return a copy of the current power type register.
+	**/
+	mnPowerReg Value();
+
+	/**
+	\brief Return a copy of the prior acquired value.
+
+	Return a copy of the prior acquired value.
+	**/
+	mnPowerReg Last() { return m_lastValue; }
+protected:
+	/** \cond INTERNAL_DOC **/
+	// Construction to wire to our node object
+	ValuePowerReg(INode &node, nodeparam pNum, bool clearOnReadType);
+	/** \endcond **/
+};
+//																			  *
+//*****************************************************************************
+
+
+//*****************************************************************************
+// NAME																	      *
 // ValueOutReg class
 /**
 	\cond SC_EXPERT
@@ -1504,27 +1988,9 @@ public:
 
 		The update will atomically read and accumulate clear-on-read style registers
 		to prevent the loss of state information when accessed by multiple
-		threads. Use one of the \a TestAndClear functions to combine with testing
-		to prevent information loss.
-
-		\see TestAndClear(const mnOutReg &, mnOutReg &)
+		threads. 
 	**/
 	void Refresh();
-	/**
-		\brief Read, Accumulate, Test and Clear Accumulated 
-		<i>Output Register</i> state
-
-		\param[in] mask Fields to test for
-		\param[out] result Fields that were cleared
-		\return true if one or more were true
-
-		This function is a thread safe way of atomically reading, testing and 
-		clearing fields from the accumulating <i>Output Registers</i>. The 
-		/a result union is updated with all the fields detected by the mask.
-		This function is useful when testing multiple fields.
-	**/
-	bool TestAndClear(const mnOutReg &mask, mnOutReg &result);
-
 	/**
 		\brief Clear fields from the output register state
 
@@ -2113,7 +2579,7 @@ public:
 		\param[in] groupNumber Group to signal on the network attached to this
 		port.
 
-		If there are no waiting moves or nodes setup at this \a groupNumber
+		If there are no waiting moves or nodes setup at this \a groupNumber,
 		this command will be ignored with no actions taken.
 
 		\see \ref CPMtriggerPage for more infomation on triggered moves
@@ -2140,6 +2606,9 @@ public:
 
 	**/
 	virtual void TriggerMovesInGroup(size_t groupNumber) = 0;
+
+
+	bool Supported();
 													/** \cond INTERNAL_DOC **/
 	// Construction
 protected:
@@ -2243,7 +2712,7 @@ public:
 
 		Use this function to ascertain the operation state of this port.
 
-		\note Ports operate independently from each other. In other words a
+		\note Ports operate independently from each other. In other words, a
 		failure on connections on one port should not affect another port.
 	**/
 	virtual openStates OpenState() = 0;
@@ -2255,7 +2724,7 @@ public:
 
 		\return True if the port came back online.
 
-		This function is useful after restarting the network after power is
+		This function is useful after restarting the network after power is lost.
 	**/
 	virtual bool WaitForOnline(int32_t timeoutMsec = 15000) = 0;
 
@@ -2283,7 +2752,7 @@ public:
 		port. If a modifier field is set, such as E-Stop, all motion will be 
 		blocked until this condition is cleared.
 
-		\see sFnd::INode::NodeStop For initiating node stops at a single node.
+		\see #sFnd::IMotion::NodeStop For initiating node stops at a single node.
 
 		\CODE_SAMPLE_HDR
 
@@ -2659,7 +3128,7 @@ public:
 	/**
 		\brief Control the posting of attentions 
 
-		\param[in] newState If set sFoundation will process received
+		\param[in] newState If set, sFoundation will process received
 		<i>Attention Requests</i>.
 
 		\note This does not turn off the generation of attentions by the node.
@@ -3103,6 +3572,13 @@ public:
 	**/
 	virtual void SignalInvalid() = 0;
 
+	/**
+		\brief Check Homing settings to see if they are set-up properly
+
+		\return True if homing has been set-up
+	**/
+	virtual bool HomingValid() = 0;
+
 protected:
 	// Construction
 													/** \cond INTERNAL_DOC **/
@@ -3188,8 +3664,7 @@ public:
 		parameter.
 
 		\note This function should only be used under direction of Teknic support
-		staff. If a non-numeric parameter is accessed, the result will be
-		indeterminate.
+		staff.
 	**/
 
 	virtual double Parameter(nodeparam index) = 0;
@@ -3520,7 +3995,8 @@ public:
 	/**
 		\brief Access the tracking limit shutdown point.
 		
-		Access the tracking limit shutdown point. Typically this value is set through the ClearView application and is not changed during the application.
+		Access the tracking limit shutdown point. This parameter is a safety limit should not be changed by the application 
+		during operation except is rare application specific circumstances.
 		
 		[Tracking error](@ref sFnd::IMotion::PosnTracking) at or beyond this point will cause a safety shutdown to occur. 
 	**/
@@ -3585,7 +4061,7 @@ public:
 	/**
 		\brief Access the deceleration limit for the next issued Asymmetric move. 
 		
-		Access the decceleration limit value for the next asymetric move. The value
+		Access the decceleration limit value for the next asymmetric move. The value
 		is specified using this node's user acceleration units. Changed values will
 		apply to the next move.  The default units are RPM/sec
 	
@@ -3784,7 +4260,7 @@ public:
 		other events in your application.
 
 		\CODE_SAMPLE_HDR
-		// SAMPLE: Using MovePosnAsymDurationMsec to set up a reasonable timeout for an asymetric move to complete
+		// SAMPLE: Using MovePosnAsymDurationMsec to set up a reasonable timeout for an asymmetric move to complete
 
 		//define a timeout in case the node is unable to complete the move
 		double timeout =  mynode.Motion.Adv.MovePosnAsymDurationMsec(1000) + 100;  
@@ -3855,8 +4331,8 @@ public:
 
 		Move requests are buffered and requests initiated during an active move will execute
 		immediately after the active move completes.  Triggered moves will wait for a trigger event before executing.
-		The return value will tell you the number of additional moves that maybe queued when
-		this request if processed.  You can also use the <i>Status
+		The return value will tell you the number of additional moves that may be queued(up to 16) when
+		this request is processed.  You can also use the <i>Status
 		Register's</i> #_cpmStatusRegFlds::MoveBufAvail field, which will be
 		deasserted when the buffer is full.
 
@@ -3893,8 +4369,8 @@ public:
 
 		Move requests are buffered and requests initiated during an active move will execute
 		immediately after the active move completes.  Triggered moves will wait for a trigger event before executing.
-		The return value will tell you the number of additional moves that maybe queued when
-		this request if processed.  You can also use the <i>Status
+		The return value will tell you the number of additional moves that may be queued(up to 16) when
+		this request is processed.  You can also use the <i>Status
 		Register's</i> #_cpmStatusRegFlds::MoveBufAvail field, which will be
 		deasserted when the buffer is full.
 
@@ -3929,8 +4405,8 @@ public:
 
 		Move requests are buffered and requests initiated during an active move will execute
 		immediately after the active move completes.  Triggered moves will wait for a trigger event before executing.
-		The return value will tell you the number of additional moves that maybe queued when
-		this request if processed.  You can also use the <i>Status
+		The return value will tell you the number of additional moves that may be queued(up to 16) when
+		this request is processed.  You can also use the <i>Status
 		Register's</i> #_cpmStatusRegFlds::MoveBufAvail field, which will be
 		deasserted when the buffer is full.
 
@@ -3957,8 +4433,8 @@ public:
 
 		Move requests are buffered and requests initiated during an active move will execute
 		immediately after the active move completes.  Triggered moves will wait for a trigger event before executing.
-		The return value will tell you the number of additional moves that maybe queued when
-		this request if processed.  You can also use the <i>Status
+		The return value will tell you the number of additional moves that may be queued(up to 16) when
+		this request is processed.  You can also use the <i>Status
 		Register's</i> #_cpmStatusRegFlds::MoveBufAvail field, which will be
 		deasserted when the buffer is full.
 
@@ -3974,7 +4450,7 @@ public:
 
 		Call this function to release a waiting move.
 
-		\note If there are no waiting moves, or if the Node is currently executing a move this command will be ignored.
+		\note If there are no waiting moves or if the Node is currently executing a move, this command will be ignored.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: This loads a relative triggered move into the move buffer
@@ -4124,7 +4600,7 @@ public:
 	/**
 		\brief Post-motion dwell time in milliseconds.
 
-		Access to the most move dwell time used in positional moves with a post move dwell.
+		Access to the post move dwell time used in positional moves with a after-move dwell.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: Getting and setting the Post-motion dwell time.
@@ -4222,8 +4698,8 @@ public:
 
 		Move requests are buffered and requests initiated during an active move will execute
 		immediately after the active move completes. The return value
-		will tell you the number of additional moves that maybe queued when
-		this request if processed.  You can also use the <i>Status
+		will tell you the number of additional moves that may be queued(up to 16) when
+		this request is processed.  You can also use the <i>Status
 		Register's</i> #_cpmStatusRegFlds::MoveBufAvail field, which will be
 		deasserted when the buffer is full.
 	**/
@@ -4242,8 +4718,8 @@ public:
 
 		Move requests are buffered and requests initiated during a active move will execute
 		immediately after the active move completes. The return value
-		will tell you the number of additional moves that maybe queued when
-		this request if processed. You can also use the <i>Status
+		will tell you the number of additional moves that may be queued(up to 16) when
+		this request is processed. You can also use the <i>Status
 		Register's</i> #_cpmStatusRegFlds::MoveBufAvail field, which will be
 		deasserted when the buffer is full.
 	**/
@@ -4254,11 +4730,10 @@ public:
 		done field.
 
 		Update the [status rise register](@ref sFnd::IStatus::Rise)  and test and clear the node
-		[At Target Velocity](@ref cpmStatusRegFlds::MoveDone) field.
+		[Move Done](@ref cpmStatusRegFlds::MoveDone) field.
 
-		\return true if <i>Move Done</i> went true since last call.
+		\return true if [Move Done](@ref cpmStatusRegFlds::MoveDone) went true since last call.
 
-		/see CPMtriggerPage
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: This checks if the Node has reached move done since the last time the application checked.
@@ -4273,8 +4748,8 @@ public:
 
 		\endcode
 
-		\note For performance reasons it maybe superior to use the Status
-		reference and perform a Refresh in a periodic place in your
+		\note For performance reasons it may be superior to use the [Status reference](@ref sFnd::IStatus::Rise) 
+		and perform a Refresh in a periodic place in your
 		application and check the results via the [Status object](@ref sFnd::ValueStatus).
 	**/
 	virtual bool MoveWentDone() = 0;
@@ -4282,11 +4757,11 @@ public:
 	/**
 		\brief Update the real-time status register and test for move done.
 
-		Refresh the [real-time status register](@ref sFnd::IStatus::RT) and test for [At Target Velocity](@ref cpmStatusRegFlds::MoveDone). 
+		Refresh the [real-time status register](@ref sFnd::IStatus::RT) and test for [Move Done](@ref cpmStatusRegFlds::MoveDone). 
 		This allows for a simple script-like interface.
 
 
-		\return true if <i>Move Done</i> is true.
+		\return true if [Move Done](@ref cpmStatusRegFlds::MoveDone) is true.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: This checks if the Node is move done.
@@ -4301,9 +4776,8 @@ public:
 
 		\endcode
 
-		\note For performance reasons it maybe superior to use the Status
-		reference and perform a Refresh in a periodic place in your
-		application and check the results via the [Status object](@ref sFnd::ValueStatus).
+		\note For performance reasons it may be superior to use the  [real-time status register](@ref sFnd::IStatus::RT) reference
+		and perform a Refresh in a periodic place in your application and check the results via the [Status object](@ref sFnd::ValueStatus).
 	**/
 	virtual bool MoveIsDone() = 0;
 
@@ -4330,8 +4804,8 @@ public:
 
 		\endcode
 
-		\note For performance reasons it maybe superior to use the Status
-		reference and perform a Refresh in a periodic place in your
+		\note For performance reasons it may be superior to use the [status rise register](@ref sFnd::IStatus::Rise) reference
+		and perform a Refresh in a periodic place in your
 		application and check the results via the [Status object](@ref sFnd::ValueStatus).
 
 
@@ -4385,7 +4859,7 @@ public:
 
 		 \endcode
 
-		 \note For performance reasons it maybe superior to use the Status
+		 \note For performance reasons it may be superior to use the [status rise register](@ref sFnd::IStatus::Rise) 
 		 reference and perform a Refresh in a periodic place in your
 		 application and check the results via the [Status object](@ref sFnd::ValueStatus).
 	**/
@@ -4397,7 +4871,7 @@ public:
 		Refresh the [real-time status register](@ref sFnd::IStatus::RT) and test for [Node Ready](@ref cpmStatusRegFlds::NotReady). 
 		This allows for a simple script-like interface.
 
-		\return true if the Node [is ready](@ref cpmStatusRegFlds::NotReady) for motion command.
+		\return true if the Node is [ready](@ref cpmStatusRegFlds::NotReady) for motion command.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: This checks if the Node is ready for motion commands
@@ -4474,8 +4948,8 @@ public:
 		\brief Clear all latching Node Stop modifiers.
 
 		This function will clear the MotionLock, E-Stop, Controlled, Disabled, 
-		etc. latching conditions from the node. Usually this will allow
-		normal operations to continue.
+		etc. latching conditions from the node. This will allow
+		normal operations to continue, unless the motor is shutdown state.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: Clear any Current NodeStops
@@ -4522,9 +4996,9 @@ public:
 		double myPosnCmd = myNode.Motion.PosnCommanded;
 		\endcode
 
-		\note The resolution of this value will be the same as the positioning resolution of the motor (800cnts/rev for "Regular" 6400cnts/rev for "Enhanced").
-		This means that for step+direction modes the position may be scaled differently from the step and direction input  based on the ratio of the input 
-		resolution set up through ClearView, and the motor's native positioning resolution.  For example, if you are using a "Regular" ClearPath-SC motor
+		\note The resolution of this value will be the same as the positioning resolution of the motor (800cnts/rev for "R" 6400cnts/rev for "E").
+		This means that for step and direction modes, the position may be scaled differently from the step and direction input  based on the ratio of the input 
+		resolution set up through ClearView, and the motor's native positioning resolution.  For example, if you are using a "R" ClearPath-SC motor
 		with a native positioning resolution of 800 cnts/rev, and you set the Input resolution to 200 steps/rev to drop in for a 200 cnt stepper motor, each
 		step sent will change the position 4 cnts.
 	**/
@@ -4562,8 +5036,8 @@ public:
 		\endcode
 
 		\note If using Soft Position limits, this command will
-		reset the motor's "I Know Where Home Is" flag(\ref IHoming::SignalComplete) causing the soft
-		limit settings to be ignored.
+		reset the motor's ["Was Homed"](@ref  _cpmStatusRegFlds::WasHomed) status causing the soft
+		limit settings to be ignored.  To re-enable soft limits see the \ref IHoming::SignalComplete function.
 
 	**/
 	virtual void AddToPosition(double adjAmount) = 0;
@@ -4605,7 +5079,7 @@ public:
 		\brief Access the current measured torque.
 
 		Access the current measured torque. The torque is scaled to the 
-		current node's torque unit. The default units are PCT_MAX.
+		current node's torque unit. The default units are percentage of maximum.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: Reading the current measured torque.
@@ -4620,7 +5094,7 @@ public:
 		\brief Access the current commanded torque.
 
 		Access the current commanded torque. The torque is scaled to the 
-		current node's torque unit. The default units are PCT_MAX.
+		current node's torque unit. The default units are percentage of maximum.
 
 		\CODE_SAMPLE_HDR
 		// SAMPLE: Reading the current commanded Torque.
@@ -4696,7 +5170,7 @@ public:
 		change application initiated actions. 
 
 		\note Use the Set and Clear functions to adjust this register when
-		multiple threads maybe changing this register.
+		multiple threads may be changing this register.
 	**/
 	ValueOutReg User;
 	/**
@@ -4739,7 +5213,8 @@ public:
 		
 		This allows the adjustment of a network watchdog timer that will
 		force a ramped Node Stop if the host stops communicating with
-		the node. 
+		the node. This is a safety feature and should not be changed except in 
+		rare application specific circumstances.
 
 		The ramp stop acceleration is setup via the E-Stop deceleration rate in ClearView.
 		This is found in the details dropdown menu in ClearView.
@@ -4850,15 +5325,15 @@ public:
 		\brief Returns true if the node is in full access mode on this network.
 
 		Returns true if the node is in full access mode on this network.  
-		The only time a node may not be in full access mode, is if ClearView is connected through the USB hub on the motor,
-		and the user has taken Full Access through ClearView.
+		The only time a node may not be in full access mode is if ClearView is connected through the USB hub on the motor
+		and the user has taken Full Access through the USB diagnostic port via ClearView.
 
 		\CODE_SAMPLE_HDR
 		// This example will check to see if the application has full access to the Node
 		if(myNode.Setup.AccessLevelIsFull())
-		{ ...we have full access normal operation can continue...}
+		{ ...we have full access. Normal operation can continue...}
 		else
-		{ ...we don't have full access set ClearView to Moniter Mode before continuing...}
+		{ ...we don't have full access. Set ClearView to Monitor Mode before continuing...}
 		\endcode
 	**/
 	virtual bool AccessLevelIsFull() = 0;
@@ -4933,21 +5408,21 @@ protected:
 	- Status Registers
 	- Alert/Shutdown Registers
 
-	Status Registers contain current information about the node's dynamic state such as whether a node is
-	in motion, or has gone move done etc. The main Realtime Status Register is maintained by the node
+	Status Registers contain current information about the node's dynamic state such as whether a node: is
+	in motion, has gone move done, etc. The main Realtime Status Register is maintained by the node
 	and is updated each sample-time to reflect the node's state.  To reduce latency and allow the capture of 
 	short transient events, the Realtime Status Register feeds a series of accumulating registers. 
 	These registers store transitional events until they are accessed by the application program. These are:
 
 	- The deassertions are captured by the Status Fallen Register. 
-	- The assertions are captured by the Status Risen & Attention Source Register. This register is the source of the autonomous Attention Packets when enabled. 
+	- The assertions are captured by the Status Risen & Attention Source Register. This register is the source of the autonomous Attention Packets when enabled on "Advanced" motors. 
 	- The Status Accumulated Register is a bitwise OR accumulation of the Realtime Status Register. This register is useful for determining if an assertion has occurred since the last access. 
 
 	
 	The Alert Register contains information regarding a shutdown the Node may have experienced during normal operation.
 	Depending on the type of alert, the application may be able to recover and/or indentify the root cause of the failure.
 
-	Access to these registers is provided through the [ValueAlert](@ref sFnd::ValueAlert), and [ValueStatus](@ref sFnd::ValueStatus) classes.
+	Access to these registers is provided through the [ValueAlert](@ref sFnd::ValueAlert) and [ValueStatus](@ref sFnd::ValueStatus) classes.
 
 	\CODE_SAMPLE_HDR
 
@@ -5051,6 +5526,13 @@ public:
 	ValueDouble RMSlevel;
 	
 	/**
+	\brief RMS level Reference.
+
+	A reference to the Node's bus and backup power status.
+	**/
+	ValuePowerReg Power;
+	
+	/**
 		\brief Advanced status information.
 
 		Access to extra status information only available in advanced ClearPath-SC nodes.
@@ -5136,7 +5618,7 @@ public:
 		// If there are nodes present, get a reference to the first one
 		INode &myNode =  myPort.Nodes(0);
 		// You can now interact with myNode
-		myNode.Outs.EnableReq(true);
+		myNode.EnableReq(true);
 	\endcode
 
 	\see sFnd::SysManager For the root object for interacting with
@@ -5158,7 +5640,7 @@ public:
 		This mechanism is used to create critical sections of code when multiple 
 		threads are accessing a node, in order to perform read-modify-write 
 		operations by one of the threads, for example. An instance of this 
-		simplifies error handling whethe node mutex is utilized.
+		simplifies error handling whether node mutex is utilized.
 
 		\note This instance should generally be created in a C++ code block
 		that requires the node mutex. It must go out of scope before the
@@ -5259,7 +5741,7 @@ public:
 	**/
 	virtual void AccUnit(enum _accUnits newUnits) = 0;
 	/**
-		\brief Get the current velocity units
+		\brief Get the current acceleration units
 
 		\return Current acceleration unit
 	**/
@@ -5330,7 +5812,7 @@ public:
 		\param[in] newUnits New torque unit
 
 		\CODE_SAMPLE_HDR
-		// Change the Units of torque to precent of max
+		// Change the Units of torque to percent of max
 		mynode.AccUnit(mynode.PCT_MAX);
 
 		// Change the Units of torque to Amps
@@ -5425,9 +5907,11 @@ protected:
 		IInfo &info, IMotion &motion, IStatus &status,
 		ILimits &limits, IOuts &outs, INodeAdv &adv, ISetup &setup,
 		INodeEx &ex);
+
 public:
 	// Destruct
 	virtual ~INode() {};
+	virtual void Refresh() {};
 													/** \endcond **/
 };
 //																			  *
@@ -5446,17 +5930,17 @@ public:
 	- The system timestamp
 	- Direct access to ports and nodes within the system
 
-	Only one instance of this object should be used in any application.
+	Only one instance of this object can be used in any application.
 
 	\CODE_SAMPLE_HDR
 	// Create instance of sFoundation
-	SysManager myMgr;
+	SysManager myMgr = SysManager::Instance();
 	// Define a port SC4-HUB attached to
-	myMgr.ComHubPort(0, 13);
+	myMgr->ComHubPort(0, 13);
 	// Tell system to open this one port
-	myMgr.PortsOpen(1);
+	myMgr->PortsOpen(1);
 	// Access Node objects through the port
-	myMgr.Ports(0).Nodes(0);
+	myMgr->Ports(0).Nodes(0);
 	\endcode
 
 	\see \ref sFnd::IPort to reference port level features
@@ -5519,8 +6003,24 @@ private:
 	portSpec m_ports[NET_CONTROLLER_MAX];
 	// Count specified from last PortsOpen call
 	size_t m_portOpenCount;
+
+	// Constructor
+	SysManager();
+
+	//Singleton Instance
+	static SysManager* _instance;
 													/** \endcond **/
 public:
+
+	
+	/**
+		\brief Search for ClearPath-SC COM Hubs on this machine
+
+		\param[out] comHubPorts This will hold a vector of strings 
+		which can later be passed to ComHubPort to open the given port(s).
+	**/
+	static void FindComHubPorts(std::vector<std::string>& comHubPorts);
+
 	#if defined(_WIN32)||defined(_WIN64)
 	/**
 		\brief Simplified setup for ClearPath-SC COM Hub
@@ -5547,13 +6047,12 @@ public:
 	void ComHubPort(size_t netNumber,
 		int portNumber,
 		netRates portRate = MN_BAUD_12X);
-	#else
+	#endif
 													/** \cond INTERNAL_DOC **/
 	void ComHubPort(size_t netNumber,
 		const char *portPath,
 		netRates portRate = MN_BAUD_12X);
 													/** \endcond **/
-	#endif
 													/** \cond INTERNAL_DOC **/
 	/**
 		\brief Get a reference to port's setup
@@ -5743,7 +6242,7 @@ public:
 
 		\param[in] theMultiAddr This a system's internal node address.
 
-		The returned node reference may exist on any define ports. 
+		The returned node reference may exist on any defined ports. 
 		
 		\remark A \ref _mnErr object is thrown if the requested address does not
 		exist in your system or the port currently is offline.
@@ -5759,9 +6258,11 @@ public:
 	**/
 	INode &NodeGet(multiaddr theMultiAddr);
 													/** \cond INTERNAL_DOC **/
-	// Constructor
-	SysManager();
+	//Destructor
 	~SysManager();
+
+	//Singleton accessor function
+	static SysManager* Instance();
 													/** \endcond **/
 };
 //																			  *

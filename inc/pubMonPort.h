@@ -16,7 +16,7 @@
 //		10/08/2009 16:24:52
 //
 // COPYRIGHT NOTICE:
-//		(C)Copyright 2009 Teknic, Inc.  All rights reserved.
+//		(C)Copyright 2009-2018 Teknic, Inc.  All rights reserved.
 //
 //		This copyright notice must be reproduced in any copy, modification,
 //		or portion thereof merged into another program. A copy of the
