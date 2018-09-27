@@ -40,8 +40,16 @@ JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_closePort
  * Method:    moveTo
  * Signature: (JIIIII)V
  */
-JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_moveTo
+JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_moveTo__JIIIII
   (JNIEnv *, jobject, jlong, jint, jint, jint, jint, jint);
+
+/*
+ * Class:     nl_bytesoflife_DeltaProtoDriver
+ * Method:    moveTo
+ * Signature: (JIIIIIII)V
+ */
+JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_moveTo__JIIIIIII
+  (JNIEnv *, jobject, jlong, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     nl_bytesoflife_DeltaProtoDriver

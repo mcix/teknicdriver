@@ -25,6 +25,7 @@ public:
 	void home();
 	void closePort();
 	void moveTo( int x, int y, int acc, int vel, int release);
+	void moveToDelay( int x, int y, int acc, int vel, int release, int delayX, int delayY);
 	void moveToX( int x, int acc, int vel, int release);
 	void moveToY( int y, int acc, int vel, int release);
 	void release( int rel);
@@ -324,10 +325,15 @@ void DeltaProtoDriverObj::home() {
 
 void DeltaProtoDriverObj::moveTo( int x, int y, int acc, int vel, int release ) {
 
+    moveToDelay(x,y,acc,vel,release,0,0);
+}
+
+void DeltaProtoDriverObj::moveToDelay( int x, int y, int acc, int vel, int release, int delayX, int delayY ) {
+
 	x= x * -1;
 	y= y * -1;
 
-	printf("moveTo x %d y %d\n", x, y);
+	printf("moveTo x %d y %d dx %d dy %d\n", x, y, delayX, delayY);
 
 	printf("OpenState %i \n", m_iPort->OpenState());
 
@@ -376,10 +382,23 @@ void DeltaProtoDriverObj::moveTo( int x, int y, int acc, int vel, int release ) 
 			m_node_x->EnableReq(true);		
 			m_node_y->EnableReq(true);		
 
-			printf("Moving Node x \t%i \n", m_node_x);
-			m_node_x->Motion.MovePosnStart(x, true);
-			printf("Moving Node y \t%i \n", m_node_y);
-			m_node_y->Motion.MovePosnStart(y, true);
+            if( delayX > delayY ) {
+
+                printf("Moving Node y \t%i \n", m_node_y);
+                m_node_y->Motion.MovePosnStart(y, true);
+
+                m_sysManager->Delay(delayX);
+                printf("Moving Node x \t%i \n", m_node_x);
+                m_node_x->Motion.MovePosnStart(x, true);
+			}
+			else {
+                printf("Moving Node x \t%i \n", m_node_x);
+                m_node_x->Motion.MovePosnStart(x, true);
+
+                m_sysManager->Delay(delayY);
+                printf("Moving Node y \t%i \n", m_node_y);
+                m_node_y->Motion.MovePosnStart(y, true);
+			}
 		}
 		catch (mnErr theErr)
 		{

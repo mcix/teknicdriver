@@ -24,6 +24,10 @@ JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_moveTo (JNIEnv *env,
     moveTo((void*)object, x, y, acc, vel, release);
 }
 
+JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_moveToDelay (JNIEnv *env, jobject thisObj, jlong object, jint x, jint y, jint acc, jint vel, jint release, jint delayX, jint delayY) {
+    moveTo((void*)object, x, y, acc, vel, release);
+}
+
 JNIEXPORT void JNICALL Java_nl_bytesoflife_DeltaProtoDriver_moveToX (JNIEnv *env, jobject thisObj, jlong object, jint x, jint acc, jint vel, jint release) {
     moveToX((void*)object, x, acc, vel, release);
 }

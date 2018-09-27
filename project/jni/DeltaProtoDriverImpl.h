@@ -14,6 +14,7 @@
         void    home(void * p);
     	void    freeDriver(void * p);
     	void  	moveTo(void * p, int x, int y, int acc, int vel, int release);
+    	void  	moveToDelay(void * p, int x, int y, int acc, int vel, int release, int delayX, int delayY);
     	void  	moveToX(void * p, int x, int acc, int vel, int release);
     	void  	moveToY(void * p, int y, int acc, int vel, int release);
     	void  	release(void * p, int release);

@@ -19,6 +19,7 @@ public class DeltaProtoDriver {
    private native void home( long pointer );
    private native void closePort( long pointer );
    private native void moveTo( long pointer, int x, int y, int acc, int vel, int release);
+   private native void moveToDelay( long pointer, int x, int y, int acc, int vel, int release, int delayX, int delayY);
    private native void moveToX( long pointer, int x, int acc, int vel, int release);
    private native void moveToY( long pointer, int y, int acc, int vel, int release);
    private native void release( long pointer, int release);
@@ -91,7 +92,7 @@ public class DeltaProtoDriver {
 
               System.out.println("move to " + x + " " + y);
 
-              dpd.moveTo(p, x, y, acc, vel, FALSE);
+              dpd.moveTo(p, x, y, acc, vel, FALSE, 500, 0);
           }
       });
 
